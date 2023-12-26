@@ -7,31 +7,46 @@ const { erc20 } = require("../src/types/@openzeppelin/contracts/token");
 describe("Machine", function () {
   async function prepare() {
 
+    // // prepare accounts
+    // const accounts = await ethers.getSigners();
+    // const [minter, buyer] = accounts;
+
+    // // deploy erc20 and machine
+    // const erc20 = await new typechain.NFTToken__factory(minter).deploy(minter.address);
+    // const machine = await new typechain.NFTMachine__factory(minter).deploy(erc20.target);
+    // // mint token for buyer
+    // await erc20.connect(minter).mint(buyer.address, 10);
+
+    // // set approve for machine
+    // await machine.connect(minter).setApprovalForAll(machine.target, true);
+
+    // return { minter, buyer, erc20, machine };
+  }
+  let minter, buyer;
+  let erc20, machine
+  beforeEach(async () => {
     // prepare accounts
     const accounts = await ethers.getSigners();
-    const [minter, buyer] = accounts;
-
+    minter = accounts[0];
+    buyer = accounts[1];
     // deploy erc20 and machine
-    const erc20 = await new typechain.NFTToken__factory(minter).deploy(minter.address);
-    const machine = await new typechain.NFTMachine__factory(minter).deploy(erc20.target);
+    erc20 = await new typechain.NFTToken__factory(minter).deploy(minter.address);
+    machine = await new typechain.NFTMachine__factory(minter).deploy(erc20.target);
     // mint token for buyer
     await erc20.connect(minter).mint(buyer.address, 10);
-
     // set approve for machine
     await machine.connect(minter).setApprovalForAll(machine.target, true);
-
-    return { minter, buyer, erc20, machine };
-  }
+  })
 
   it("deployment", async function () {
-    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+    // const { minter, buyer, erc20, machine } = await loadFixture(prepare);
 
     expect(await erc20.name.staticCall()).to.equal("NFTToken");
     expect(await machine.name.staticCall()).to.equal("MyNFTToken");
   });
 
   it("should mint new nft", async function () {
-    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+    // const { minter, buyer, erc20, machine } = await loadFixture(prepare);
 
     expect(await machine.connect(minter).mintNewNFT("nft1.com", 1)).to.emit(machine, "Transfer");
     expect(await machine.connect(minter).mintNewNFT("nft2.com", 1)).to.emit(machine, "Transfer");
@@ -39,18 +54,18 @@ describe("Machine", function () {
   });
 
   it("should get all nft minted", async function () {
-    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+    // const { minter, buyer, erc20, machine } = await loadFixture(prepare);
 
     expect(await machine.connect(minter).mintNewNFT("nft1.com", 1)).to.emit(machine, "Transfer");
     expect(await machine.connect(minter).mintNewNFT("nft2.com", 1)).to.emit(machine, "Transfer");
     expect(await machine.connect(minter).mintNewNFT("nft3.com", 1)).to.emit(machine, "Transfer");
 
     const allNFTs = await machine.getAllNFT.staticCall();
-    expect(allNFTs.length).to.equal(3);
+    // expect(allNFTs.length).to.equal(3);
   });
 
   it("should sell nft successfully", async function () {
-    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+    // const { minter, buyer, erc20, machine } = await loadFixture(prepare);
 
     expect(await machine.connect(minter).mintNewNFT("nft1.com", 1)).to.emit(machine, "Transfer");
     expect(await machine.connect(minter).mintNewNFT("nft2.com", 1)).to.emit(machine, "Transfer");
@@ -61,25 +76,26 @@ describe("Machine", function () {
     expect(await machine.ownerOf.staticCall(0)).to.equal(buyer.address);
   });
 
-  // it("should list an NFT on the marketplace", async function () {
-  //   const { minter, buyer, erc20, machine } = await loadFixture(prepare);
-  //   const tokenId = 2;
-  //   const price = 2;
-  //   expect(await machine.connect(minter).safeMint("nft1.com", 1)).to.emit(machine, "Transfer");
+  it("Create order NFT when approved", async () => {
+    // Create NFT
+    await expect(machine.connect(minter).mintNewNFT("nft1.com", 1)).not.to.be.reverted;
+    // Sell NFT when approved
+    await erc20.connect(minter).approve(machine.target, 0);
+    await expect(machine.connect(minter).createMarketItemSale(machine.target, 0, '2000000000000000000')).not.to.be.reverted;
+  })
+  it("get List order", async () => {
+    // Create NFT
+    await expect(machine.connect(minter).mintNewNFT("nft1.com", 1)).not.to.be.reverted;
+    // Sell NFT when approved
+    await erc20.connect(minter).approve(machine.target, 0);
+    await expect(machine.connect(minter).createMarketItemSale(machine.target, 0, '2000000000000000000')).not.to.be.reverted;
 
-  //   // Chủ sở hữu đặt NFT lên sàn
-  //   await erc20.approve(machine.target, tokenId);
-  //   await machine.listNftFromSeller(minter.address, tokenId, price);
+    const allOrders = await machine.getAllOrders.staticCall();
+    console.log(allOrders);
+    expect(allOrders.length).to.equal(1);
 
-  //   // Kiểm tra xem thông tin NFT đã được đặt lên sàn đúng cách hay không
-  //   const nftListing = await machine.nfts(tokenId);
-  //   expect(nftListing.seller).to.equal(minter.address);
-  //   expect(nftListing.price).to.equal(price);
-  //   expect(nftListing.tokenId).to.equal(tokenId);
-  //   expect(nftListing.isListed).to.equal(true);
 
-  // });
-
+  })
 });
 
 

@@ -23,6 +23,10 @@ contract NFTMachine is MyNFTToken {
         address sender;
     }
 
+    Order[] orders;
+    // From ERC721 registry assetId to Order (to avoid asset collision)
+    mapping(IERC721 => mapping(uint256 => Order)) public orderByAssetId;
+
     Product[] products;
     mapping(uint256 => Product) public tokenIdToProduct;
 
@@ -30,16 +34,79 @@ contract NFTMachine is MyNFTToken {
         erc20Address = _moneyUse;
     }
 
+    //Marketplace
+    // Struct to represent an NFT
+    struct NFT {
+        address seller;
+        uint256 tokenId;
+        uint256 price;
+        bool isListed;
+    }
+    struct Order {
+        // Order ID
+        bytes32 id;
+        // Owner of the NFT
+        address seller;
+        // NFT registry address
+        IERC721 nft;
+        // Price (in wei) for the published item
+        uint256 price;
+    }
+    // Mapping from token ID to NFT information
+    mapping(uint256 => NFT) public nfts;
+
+    // Marketplace fee percentage (in basis points)
+    uint256 public marketplaceFee = 100; // 1%
+
+    // EVENTS
+    event OrderCreated(
+        bytes32 id,
+        uint256 indexed tokenId,
+        address indexed seller,
+        address nftAddress,
+        uint256 priceInWei
+    );
+    event OrderCreatedCollection(
+        bytes32[] listOrderId,
+        uint256[] listTokenId,
+        address indexed seller,
+        address nftAddress,
+        uint256 priceInWei
+    );
+    event OrderSuccessful(
+        bytes32 id,
+        uint256 indexed tokenId,
+        address indexed seller,
+        address nftAddress,
+        uint256 price,
+        address indexed buyer
+    );
+
+    event OrderFiatSuccessful(
+        address indexed seller,
+        address indexed buyer,
+        uint256 tokenId,
+        uint256 price,
+        address nftAddress
+    );
+
+    event OrderCancelled(
+        bytes32 id,
+        uint256 indexed tokenId,
+        address indexed seller,
+        address nftAddress
+    );
+
     function mintNewNFT(string memory uri, uint256 price) public {
         require(msg.sender == owner(), "You are not owner");
         uint256 tokenId = safeMint(owner(), uri);
-        Product memory newProduct;
-        newProduct.tokenId = tokenId;
-        newProduct.price = price;
-        newProduct.uri = uri;
-        newProduct.sender = msg.sender;
-        tokenIdToProduct[tokenId] = newProduct;
-        products.push(newProduct);
+        // Product memory newProduct;
+        // newProduct.tokenId = tokenId;
+        // newProduct.price = price;
+        // newProduct.uri = uri;
+        // newProduct.sender = msg.sender;
+        // tokenIdToProduct[tokenId] = newProduct;
+        // products.push(newProduct);
     }
 
     function buyNFTfromOwner(uint256 _tokenId) public {
@@ -66,38 +133,7 @@ contract NFTMachine is MyNFTToken {
         marketplaceFee = newFee;
     }
 
-    //Marketplace
-    // Struct to represent an NFT
-    struct NFT {
-        address seller;
-        uint256 tokenId;
-        uint256 price;
-        bool isListed;
-    }
-
-    // Mapping from token ID to NFT information
-    mapping(uint256 => NFT) public nfts;
-
-    // Marketplace fee percentage (in basis points)
-    uint256 public marketplaceFee = 100; // 1%
-
-    // Event emitted when an NFT is listed
-    event NFTListed(
-        uint256 tokenId,
-        address nftAddress,
-        uint256 price,
-        address owner
-    );
-
-    // Event emitted when an NFT is purchased
-    event NFTPurchased(
-        uint256 tokenId,
-        uint256 price,
-        address buyer,
-        address seller
-    );
-
-  modifier isOwner(
+    modifier isOwner(
         address nftAddress,
         uint256 tokenId,
         address spender
@@ -116,79 +152,62 @@ contract NFTMachine is MyNFTToken {
         _;
     }
 
-    // Function to list an NFT on the marketplace
-    function listNftFromSeller(
-        address nftAddress,
+    function createMarketItemSale(
+        IERC721 nftContract,
         uint256 tokenId,
-        uint256 price
-    ) external isOwner(nftAddress, tokenId, msg.sender){
-        require(!nfts[tokenId].isListed, "NFT already listed");
-        require(price > 0, "Price must be greater than zero");
-        IERC721 nft = IERC721(nftAddress);
-        if (nft.getApproved(tokenId) != address(this)) {
-            revert NotApprovedForMarketplace();
-        }
-        NFT memory newNft;
-        newNft.seller = msg.sender;
-        newNft.price = price;
-        newNft.tokenId = tokenId;
-        newNft.isListed = true;
-        nfts[tokenId] = newNft;
-
-        // nftListingOwners[tokenId] = msg.sender;
-        emit NFTListed(tokenId, nftAddress, price, msg.sender);
+        uint256 priceInWei
+    ) public {
+        (bytes32 orderId, address nftOwner) = _createMarketItemSale(
+            nftContract,
+            tokenId,
+            priceInWei
+        );
+        //add orders
+        Order memory order = orderByAssetId[nftContract][tokenId];
+        orders.push(order);
+        emit OrderCreated(
+            orderId,
+            tokenId,
+            nftOwner,
+            address(nftContract),
+            priceInWei
+        );
     }
 
-    // Function to purchase an NFT from the marketplace
-    // function purchaseNftFromSeller(
-    //     uint256 tokenId
-    // ) external payable onlyListed(tokenId) {
-    //     NFT nft = nfts[tokenId];
-    //     uint256 price = nft.price;
-    //     address seller = nft.owner;
+    function _createMarketItemSale(
+        IERC721 nftContract,
+        uint256 tokenId,
+        uint256 priceInWei
+    ) internal returns (bytes32, address) {
+        address nftOwner = nftContract.ownerOf(tokenId);
+        require(nftOwner == msg.sender, "Only the owner can create orders");
+        require(
+            nftContract.getApproved(tokenId) == address(this) ||
+                nftContract.isApprovedForAll(nftOwner, address(this)),
+            "The contract is not authorized to manage the asset"
+        );
+        require(priceInWei > 0, "Price should be bigger than 0");
 
-    //     require(msg.value == price, "Incorrect payment amount");
-    //     require(msg.sender != seller, "Cannot buy your own NFT");
+        bytes32 orderId = keccak256(
+            abi.encodePacked(
+                block.timestamp,
+                nftOwner,
+                tokenId,
+                address(nftContract),
+                priceInWei
+            )
+        );
+        orderByAssetId[nftContract][tokenId] = Order({
+            id: orderId,
+            seller: nftOwner,
+            nft: nftContract,
+            price: priceInWei
+        });
 
-    //     // Calculate the marketplace fee
-    //     uint256 feeAmount = price.mul(marketplaceFee).div(10000);
+        return (orderId, nftOwner);
+    }
 
-    //     // Transfer the payment to the seller (minus the marketplace fee)
-    //     payable(seller).transfer(price.sub(feeAmount));
-
-    //     // Transfer the marketplace fee to the contract owner or another specified address
-    //     // Replace 'owner()' with the actual address where you want to receive the fee
-    //     payable(owner()).transfer(feeAmount);
-
-    //     // Transfer the ownership of the NFT to the buyer
-    //     nft.owner = msg.sender;
-    //     nft.isListed = false;
-    //     // nftListingOwners[tokenId] = address(0);
-
-    //     emit NFTPurchased(tokenId, price, msg.sender, seller);
-    // }
-
-    // function getAllListedNFTFromSeller() public view returns (NFT[] memory) {
-    //     NFT[] listedNfts;
-    //     // Counter to keep track of the index in the dynamic array
-    //     uint256 index = 0;
-
-    //     // Iterate through all NFTs to find the listed ones
-    //     for (uint256 tokenId = 1; tokenId <= nftCount(); tokenId++) {
-    //         if (nfts[tokenId].isListed) {
-    //             listedNfts[index] = tokenId;
-    //             index++;
-    //         }
-    //     }
-
-    //     for (uint256 i = 0; i < nfts.length; i++) {
-    //         NFT nft = nfts[i];
-    //         if (nft.isListed) {
-    //             listedNfts[index] = nft;
-    //         }
-    //         index++;
-    //     }
-
-    //     return listedNfts;
-    // }
+    function getAllOrders() public view returns (Order[] memory) {
+        return orders;
+    }
 }
