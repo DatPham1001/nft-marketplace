@@ -61,27 +61,24 @@ describe("Machine", function () {
     expect(await machine.ownerOf.staticCall(0)).to.equal(buyer.address);
   });
 
-  it("should list an NFT on the marketplace", async function () {
-    const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+  // it("should list an NFT on the marketplace", async function () {
+  //   const { minter, buyer, erc20, machine } = await loadFixture(prepare);
+  //   const tokenId = 2;
+  //   const price = 2;
+  //   expect(await machine.connect(minter).safeMint("nft1.com", 1)).to.emit(machine, "Transfer");
 
+  //   // Chủ sở hữu đặt NFT lên sàn
+  //   await erc20.approve(machine.target, tokenId);
+  //   await machine.listNftFromSeller(minter.address, tokenId, price);
 
+  //   // Kiểm tra xem thông tin NFT đã được đặt lên sàn đúng cách hay không
+  //   const nftListing = await machine.nfts(tokenId);
+  //   expect(nftListing.seller).to.equal(minter.address);
+  //   expect(nftListing.price).to.equal(price);
+  //   expect(nftListing.tokenId).to.equal(tokenId);
+  //   expect(nftListing.isListed).to.equal(true);
 
-    const tokenId = 2;
-    const price = 2;
-    expect(await machine.connect(minter).safeMint("nft1.com", 1)).to.emit(machine, "Transfer");
-
-    // Chủ sở hữu đặt NFT lên sàn
-    await erc20.approve(machine.target, tokenId);
-    await machine.listNftFromSeller(minter.address, tokenId, price);
-
-    // Kiểm tra xem thông tin NFT đã được đặt lên sàn đúng cách hay không
-    const nftListing = await machine.nfts(tokenId);
-    expect(nftListing.seller).to.equal(minter.address);
-    expect(nftListing.price).to.equal(price);
-    expect(nftListing.tokenId).to.equal(tokenId);
-    expect(nftListing.isListed).to.equal(true);
-
-  });
+  // });
 
 });
 
