@@ -1,39 +1,41 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("@nomicfoundation/hardhat-verify");
-require("@nomicfoundation/hardhat-chai-matchers");
-require("@nomicfoundation/hardhat-ethers");
-require("@nomicfoundation/hardhat-network-helpers");
-require("@typechain/hardhat");
-require("dotenv").config();
-import "hardhat-gas-reporter"
-/** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
-  solidity: "0.8.21",
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "@typechain/hardhat";
+import "hardhat-gas-reporter";
+import '@symblox/hardhat-abi-gen';
+import dotenv from "dotenv";
+dotenv.config()
+const config: HardhatUserConfig = {
+  defaultNetwork: "hardhat",
   networks: {
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL,
-      accounts: {
-        mnemonic: process.env.MNEMONIC
+      url: process.env.SEPOLIA_RPC_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    }
+  },
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.0",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       },
-      chainId: 11155111
-    }
-  },
-  gasReporter: {
-    enabled: (process.env.REPORT_GAS) ? true : false
-  },
-  etherscan: {
-    apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY,
-    }
-  },
-  mocha: {
-    timeout: 2000000
-  },
-  typechain: {
-    outDir: "src/types",
-    target: "ethers-v6",
-    alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
-    // externalArtifacts: ['externalArtifacts/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
-    dontOverrideCompile: false // defaults to false
+      {
+        version: "0.8.1",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+    ],
   }
-};
+}
+
+export default config
