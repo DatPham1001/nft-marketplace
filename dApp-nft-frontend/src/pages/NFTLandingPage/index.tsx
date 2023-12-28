@@ -6,6 +6,8 @@ import { MetaMaskButton } from "@metamask/sdk-react-ui";
 import { ethers } from "ethers";
 import * as typechain from "nft-machine";
 import { log } from "console";
+import { Link, NavLink, Router } from "react-router-dom";
+import { NavBar } from "components/NavBar";
 
 
 const NFTLandingPagePage = ({ params }) => {
@@ -46,7 +48,7 @@ const NFTLandingPagePage = ({ params }) => {
       //         });
       //       })
       let nfts = [];
-      const removeIds = ["0", "1", "2", "3","4","5"];
+      const removeIds = ["0", "1", "2", "3", "4", "5"];
       for (const nft of nftList) {
         const tokenId = nft[0].toString();
         if (removeIds.includes(tokenId))
@@ -96,40 +98,7 @@ const NFTLandingPagePage = ({ params }) => {
                 NFT
               </Text>
             </div>
-            <div className="flex md:flex-1 md:flex-col flex-row font-poppins md:gap-10 gap-16 items-center justify-start md:pr-10 pr-32 sm:pr-5 pt-12 w-auto md:w-full">
-              <div className="flex flex-row gap-16 items-start justify-start w-auto">
-                <Text
-                  className="text-lg text-purple-A200 w-auto"
-                  size="txtPoppinsMedium18"
-                >
-                  Home
-                </Text>
-                <Text
-                  className="text-gray-900 text-lg w-auto"
-                  size="txtPoppinsMedium18Gray900"
-                >
-                  Explore
-                </Text>
-                <Text
-                  className="text-gray-900 text-lg w-auto"
-                  size="txtPoppinsMedium18Gray900"
-                >
-                  How it works
-                </Text>
-              </div>
-
-              {/* <Button
-                className="bg-transparent cursor-pointer flex items-center justify-center min-w-[238px]"
-                variant="outline"
-                color="purple_A200_cyan_A100"
-              >
-                <div className="font-medium leading-[normal] text-left text-lg">
-                  Connect Wallet
-                </div> */
-                // </Button>
-              }
-              <MetaMaskButton theme={"light"} color="white"></MetaMaskButton>
-            </div>
+            <NavBar></NavBar>
           </div>
           <div className="font-poppins md:h-[656px] h-[683px] mt-[26px] relative w-[96%] md:w-full">
             <div className="absolute bottom-[16%] flex flex-col h-[385px] md:h-auto items-start justify-center left-[0] w-[454px] sm:w-full">

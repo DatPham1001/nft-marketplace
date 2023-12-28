@@ -1,0 +1,13 @@
+#navbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    background-color: #fff; /* Màu nền của Navbar */
+    z-index: 1000; /* Đảm bảo nằm trên các thành phần khác */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng cho Navbar nếu cần */
+  }
+  
+  /* Khoảng trống để tránh che phủ nội dung */
+  body {
+    padding-top: 60px; /* Điều chỉnh khoảng trống tùy thuộc vào chiều cao của Navbar */
+  }

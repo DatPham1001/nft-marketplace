@@ -36,12 +36,22 @@ contract NFTMachine is MyNFTToken {
 
     //Marketplace
     // Struct to represent an NFT
+    NFT[] myNfts;
+
     struct NFT {
-        address seller;
+        address owner;
         uint256 tokenId;
-        uint256 price;
-        bool isListed;
+        string name;
+        string img;
+        string ủ
+        Attribute[] attributes;
     }
+
+    struct Attribute {
+        string key;
+        string value;
+    }
+
     struct Order {
         // Order ID
         bytes32 id;
@@ -52,8 +62,6 @@ contract NFTMachine is MyNFTToken {
         // Price (in wei) for the published item
         uint256 price;
     }
-    // Mapping from token ID to NFT information
-    mapping(uint256 => NFT) public nfts;
 
     // Marketplace fee percentage (in basis points)
     uint256 public marketplaceFee = 100; // 1%
@@ -109,6 +117,17 @@ contract NFTMachine is MyNFTToken {
         products.push(newProduct);
     }
 
+    function sellerMintNewNFT(string memory uri) public {
+        uint256 tokenId = safeMint(owner(), uri);
+        Product memory newProduct;
+        newProduct.tokenId = tokenId;
+        newProduct.price = price;
+        newProduct.uri = uri;
+        newProduct.sender = msg.sender;
+        tokenIdToProduct[tokenId] = newProduct;
+        products.push(newProduct);
+    }
+
     function buyNFTfromOwner(uint256 _tokenId) public {
         require(
             IERC20(erc20Address).allowance(msg.sender, address(this)) >=
@@ -124,6 +143,10 @@ contract NFTMachine is MyNFTToken {
     }
 
     function getAllNFT() public view returns (Product[] memory) {
+        return products;
+    }
+
+    function getMyNFT() public view returns (Product[] memory) {
         return products;
     }
 
@@ -143,12 +166,6 @@ contract NFTMachine is MyNFTToken {
         if (spender != owner) {
             revert NotOwner();
         }
-        _;
-    }
-
-    // Modifier to ensure that an NFT is listed
-    modifier onlyListed(uint256 tokenId) {
-        require(nfts[tokenId].isListed, "NFT not listed");
         _;
     }
 

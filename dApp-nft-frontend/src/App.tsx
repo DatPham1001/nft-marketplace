@@ -6,8 +6,11 @@ import {
   Routes,
   Route
 } from "react-router-dom";
+import { Button, Img, Text } from "components";
 import * as typechain from "nft-machine";
 import fs from 'fs';
+import { NavBar } from "components/NavBar";
+import CreateNftPage from "pages/CreateNftPage";
 const nftTokenContract = "0x9C3fc11735c3B754CCa9e5FCe6a4aa4E8e4544ab"
 const machineContract = "0x066c81B6E955C52aC73f300E2DB16F6e71214bA8"
 const minter = "0x392d672E6E4ba33e8AEe46C5A9e7B87d3c802A32"
@@ -35,7 +38,6 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <>
-          {/* <Navigation web3Handler={web3Handler} account={account} /> */}
         </>
         <div>
           {/* {loading ? (
@@ -45,9 +47,8 @@ function App() {
             </div>
           ) : ( */}
           <Routes>
-            <Route path="/" element={
-              <NFTLandingPagePage params={params} />
-            } />
+            <Route path="/" element={<NFTLandingPagePage params={params} />} />
+            <Route path="/createNft" element={<CreateNftPage params={params} />} />
             {/* <Route path="/create" element={
                 <Create marketplace={marketplace} nft={nft} />
               } />
@@ -60,6 +61,9 @@ function App() {
           </Routes>
           {/* )} */}
         </div>
+      </div>
+      <div className="text-center text-gray-600 mt-8">
+        © 2023 Your Company. All rights reserved.
       </div>
     </BrowserRouter>
   )
