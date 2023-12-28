@@ -1,5 +1,5 @@
 module.exports = [
-    "0xA80Bc339a70711d8a288d8d284857A47d1081E41"
+    "0x9C3fc11735c3B754CCa9e5FCe6a4aa4E8e4544ab"
 ]
 
 

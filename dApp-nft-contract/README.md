@@ -12,6 +12,8 @@ npx hardhat node
 npx hardhat run scripts/deploy.js
 
 npx hardhat run scripts/deploy.js --network sepolia
+
+npx hardhat verify <machine address> --network sepolia --constructor-args .\scripts\arguments.js
 ```
 wallet:
 erc20:  0x5FbDB2315678afecb367f032d93F642f64180aa3

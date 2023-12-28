@@ -30,7 +30,6 @@
   "directories": {
     "test": "test"
   },
-  "author": "vuonghuuhung",
   "license": "ISC",
   "type": "commonjs"
 }

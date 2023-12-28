@@ -1,0 +1,6 @@
+const nftTokenContract = 0x9C3fc11735c3B754CCa9e5FCe6a4aa4E8e4544ab
+const machineContract = 0x066c81B6E955C52aC73f300E2DB16F6e71214bA8
+const minter = 0x392d672E6E4ba33e8AEe46C5A9e7B87d3c802A32
+const buyer = 0x7493e77B6C2b9c550A6Fe4C392A24E1452EE65f1
+
+Verify shell npx hardhat verify 0x066c81B6E955C52aC73f300E2DB16F6e71214bA8--network sepolia --constructor-args .scriptsarguments.js 

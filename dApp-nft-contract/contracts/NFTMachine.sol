@@ -100,13 +100,13 @@ contract NFTMachine is MyNFTToken {
     function mintNewNFT(string memory uri, uint256 price) public {
         require(msg.sender == owner(), "You are not owner");
         uint256 tokenId = safeMint(owner(), uri);
-        // Product memory newProduct;
-        // newProduct.tokenId = tokenId;
-        // newProduct.price = price;
-        // newProduct.uri = uri;
-        // newProduct.sender = msg.sender;
-        // tokenIdToProduct[tokenId] = newProduct;
-        // products.push(newProduct);
+        Product memory newProduct;
+        newProduct.tokenId = tokenId;
+        newProduct.price = price;
+        newProduct.uri = uri;
+        newProduct.sender = msg.sender;
+        tokenIdToProduct[tokenId] = newProduct;
+        products.push(newProduct);
     }
 
     function buyNFTfromOwner(uint256 _tokenId) public {

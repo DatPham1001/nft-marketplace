@@ -1,6 +1,20 @@
-{
-    "name": "New Alien",
-    "imgUrl": "https://s6.imgcdn.dev/Rvqxi.png"
-}
-
-
+[
+    {
+        "name": "Cute Creature #1",
+        "image": "https://example.com/cute-creature-1.png",
+        "attributes": {
+            "color": "pink",
+            "eyes": "sparkling",
+            "expression": "happy"
+        }
+    },
+    {
+        "name": "Cute Creature #2",
+        "image": "https://example.com/cute-creature-2.png",
+        "attributes": {
+            "color": "blue",
+            "eyes": "big",
+            "expression": "curious"
+        }
+    }
+]

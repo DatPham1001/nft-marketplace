@@ -2,6 +2,7 @@ const hre = require("hardhat");
 const { ethers } = hre;
 const typechain = require("../src/types");
 const { log } = require("console");
+const fs = require('fs').promises;
 
 async function main() {
   // prepare accounts
@@ -27,7 +28,7 @@ async function main() {
   // // set approve for machine
   // tx = await machine.connect(minter).setApprovalForAll(machine.target, true);
   // console.log('tx approve all for machine: ', tx.hash);
-  deploy(minter,buyer);
+  deploy(minter, buyer);
   // reApprovealForAll(minter);
 }
 
@@ -38,50 +39,28 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
-async function deploy(minter,buyer){
-    // deploy erc20 and machine
-  const erc20 = await new typechain.MyERC20Token__factory(minter).deploy(minter.address);
+async function deploy(minter, buyer) {
+  const contractinfo = []
+  // deploy erc20 and machine
+  const erc20 = await new typechain.MyNFTToken__factory(minter).deploy(minter.address);
   console.log('erc20: ', erc20.target);
+  contractinfo.push("const nftTokenContract = " + erc20.target)
   // saveFrontendFiles(erc20, "NFT");
   const machine = await new typechain.NFTMachine__factory(minter).deploy(erc20.target);
   console.log('machine: ', machine.target);
+  contractinfo.push("const machineContract = " + machine.target)
   // saveFrontendFiles(machine, "Marketplace");
   // mint token for buyer
-  let tx = await erc20.connect(minter).mint(buyer.address, 10);
-
-  console.log('tx mint token: ', tx.hash);
-
+  let tx = await erc20.connect(minter).safeMint(buyer.address, 1000000000);
+  console.log('tx mint token: "' + tx.hash);
+  contractinfo.push("const minter = ", minter.address)
   // set approve for machine
-  tx = await machine.connect(minter).setApprovalForAll(machine.target, true);
-  console.log('tx approve all for machine: ', tx.hash);
-}
-//if approval failed
-async function reApprovealForAll(minter) {
-  const contractAddress = "0x5e401651572df3D3fEcA4aF502c090933a995b8C";
-  const myContract = await hre.ethers.getContractAt("NFTMachine", contractAddress);
-  // const machine = new typechain.NFTMachine__factory(minter).connect(minter)
-  console.log(machine);
-
-}
-function saveFrontendFiles(contract, name) {
-  const fs = require("fs");
-  const contractsDir = __dirname + "../contractsData";
-
-  if (!fs.existsSync(contractsDir)) {
-    fs.mkdirSync(contractsDir);
-  }
-
-  fs.writeFileSync(
-    contractsDir + `/${name}-address.json`,
-    JSON.stringify({ address: contract.address }, undefined, 2)
-  );
-
-  const contractArtifact = artifacts.readArtifactSync(name);
-
-  fs.writeFileSync(
-    contractsDir + `/${name}.json`,
-    JSON.stringify(contractArtifact, null, 2)
-  );
+  let tx2 = await machine.connect(minter).setApprovalForAll(machine.target, true);
+  console.log('tx approve all for machine: ' + tx2.hash);
+  contractinfo.push("const buyer = " + buyer.address)
+  contractinfo.push("Verify shell npx hardhat verify " + machine.target + "--network sepolia --constructor-args .\scripts\arguments.js ")
+  await fs.writeFile('contractinfo.txt', contractinfo.join("\n\n"));
+  console.log('Deployment information written to contractinfo.txt');
 }
 
 
