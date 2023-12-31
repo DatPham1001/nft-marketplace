@@ -15,6 +15,17 @@ error PriceMustBeAboveZero();
 
 contract NFTMachine is MyNFTToken {
     address public erc20Address;
+    // struct NFT
+    // mapping tokenId to owner's address
+    // mapping owner's address to a list of tokenId
+    // function mint new NFT
+    // function get owner's all NFT
+    // function get NFT metadata
+    // function transfer NFT
+    // struct order
+    // function create order
+    // function cancel order 
+    // function buy
 
     struct Product {
         uint256 tokenId;
@@ -43,7 +54,7 @@ contract NFTMachine is MyNFTToken {
         uint256 tokenId;
         string name;
         string img;
-        string ủ
+        string user;
         Attribute[] attributes;
     }
 
@@ -121,7 +132,7 @@ contract NFTMachine is MyNFTToken {
         uint256 tokenId = safeMint(owner(), uri);
         Product memory newProduct;
         newProduct.tokenId = tokenId;
-        newProduct.price = price;
+        // newProduct.price = price;
         newProduct.uri = uri;
         newProduct.sender = msg.sender;
         tokenIdToProduct[tokenId] = newProduct;
