@@ -23,7 +23,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     struct NFT {
         uint256 tokenId; // maybe removed
-        string name;
+        string attribute_uri;
         string img_uri;
         // NFTAttribute[] attributes;
         // address owner; // maybe removed
@@ -46,13 +46,13 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     mapping (address => uint256[]) public userNFTCollection;
 
     // function mint new NFT
-    function mintNewNFT(string memory name, string memory img_uri) public {
+    function mintNewNFT(string memory attribute_uri, string memory img_uri) public {
         require(msg.sender == owner(), "You are not owner");
         uint256 tokenId = safeMint(owner(), img_uri);
         // Save NFT
         NFT memory newNFT;
         newNFT.tokenId = tokenId;
-        newNFT.name = name;
+        newNFT.attribute_uri = attribute_uri;
         newNFT.img_uri = img_uri;
         tokenIdToNFT[tokenId] = newNFT;
         AllNFTs.push(newNFT);
