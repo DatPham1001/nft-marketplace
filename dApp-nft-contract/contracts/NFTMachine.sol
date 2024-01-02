@@ -23,8 +23,8 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     struct NFT {
         uint256 tokenId; // maybe removed
-        string attribute_uri;
-        string img_uri;
+        string attribute_url;
+        // string img_uri;
         // NFTAttribute[] attributes;
         // address owner; // maybe removed
     }
@@ -46,20 +46,22 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     mapping (address => uint256[]) public userNFTCollection;
 
     // function mint new NFT
-    function mintNewNFT(string memory attribute_uri, string memory img_uri) public {
+    function mintNewNFT(string memory attribute_url) public returns(uint256) {
         require(msg.sender == owner(), "You are not owner");
-        uint256 tokenId = safeMint(owner(), img_uri);
+        uint256 tokenId = safeMint(owner(), attribute_url);
         // Save NFT
         NFT memory newNFT;
         newNFT.tokenId = tokenId;
-        newNFT.attribute_uri = attribute_uri;
-        newNFT.img_uri = img_uri;
+        newNFT.attribute_url = attribute_url;
+        // newNFT.img_uri = img_uri;
         tokenIdToNFT[tokenId] = newNFT;
         AllNFTs.push(newNFT);
 
         // Set owner
         tokenIdOwner[tokenId] = owner();
         userNFTCollection[owner()].push(tokenId);
+
+        return tokenId;
     }
 
     // function get owner's all NFT
@@ -71,10 +73,52 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         }
         return owner_NFT;
     }
-}
+
     // function transfer NFT
     // struct order
+    uint256 public orderId = 0;
+
+    struct Order {
+        uint256 orderId;
+        uint256 tokenId;
+        address seller;
+        uint256 price;
+    }
+
+    Order[] AllOrders;
+    // Mapping to store orders created by NFT owners
+    mapping(uint256 => Order) public orders;
+
+    // A NFT is listing or not
+    mapping(uint256 => bool) public listing;
+
     // function create order
+    function createOrder(IERC721 nftContract, uint256 tokenId, uint256 price) public returns(uint256) {
+        address nftOwner = nftContract.ownerOf(tokenId);
+        require(
+            nftContract.getApproved(tokenId) == address(this) ||
+                nftContract.isApprovedForAll(nftOwner, address(this)),
+            "The contract is not authorized to manage the asset"
+        );
+        require(ownerOf(tokenId) == msg.sender, "Only the NFT owner can create an order");
+        require(price > 0, "Price must be greater than zero");
+        require(listing[tokenId] == false, "NFT is listing");
+
+        Order memory newOrder;
+        orderId = orderId++;
+        newOrder.orderId = orderId;
+        newOrder.tokenId = tokenId;
+        newOrder.seller = msg.sender;
+        newOrder.price = price;
+
+        orders[orderId] = newOrder;
+
+        AllOrders.push(newOrder);
+
+        listing[tokenId] = true;
+
+        return orderId;
+    }
     // function cancel order 
     // function buy
 
@@ -290,3 +334,4 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     //     return orders;
     // }
 // }
+}
