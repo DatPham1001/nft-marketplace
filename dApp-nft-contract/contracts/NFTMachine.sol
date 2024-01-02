@@ -76,7 +76,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // function transfer NFT
     // struct order
-    uint256 public orderId = 0;
+    uint256 public _orderId = 0;
 
     struct Order {
         uint256 orderId;
@@ -84,8 +84,12 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         address seller;
         uint256 price;
     }
+    
+    // mapping orderId to Order data
+    mapping(uint256 => Order) public orderIdtoOrder;
 
     Order[] AllOrders;
+    
     // Mapping to store orders created by NFT owners
     mapping(uint256 => Order) public orders;
 
@@ -97,20 +101,22 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         return AllOrders;
     }
 
+    // before creating order, user must call approve() to approve NFT to smartcontract address 
     // function create order
     function createOrder(IERC721 nftContract, uint256 tokenId, uint256 price) public returns(uint256) {
         address nftOwner = nftContract.ownerOf(tokenId);
         require(
             nftContract.getApproved(tokenId) == address(this) ||
                 nftContract.isApprovedForAll(nftOwner, address(this)),
-            "The contract is not authorized to manage the asset"
+            "The contract is not authorized to manage the NFT."
         );
-        require(ownerOf(tokenId) == msg.sender, "Only the NFT owner can create an order");
-        require(price > 0, "Price must be greater than zero");
-        require(listing[tokenId] == false, "NFT is listing");
+        require(ownerOf(tokenId) == msg.sender, "Only the NFT owner can create an order.");
+        require(price > 0, "Price must be greater than zero.");
+        require(listing[tokenId] == false, "NFT is listing.");
 
+        // Save order
         Order memory newOrder;
-        orderId = orderId++;
+        uint256 orderId = _orderId++;
         newOrder.orderId = orderId;
         newOrder.tokenId = tokenId;
         newOrder.seller = msg.sender;
@@ -120,11 +126,28 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
         AllOrders.push(newOrder);
 
+        orderIdtoOrder[orderId] = newOrder;
+
+        // Mark NFT as listing
         listing[tokenId] = true;
 
         return orderId;
     }
+
     // function cancel order 
+    function cancelOrder(uint256 orderId) public returns(bool) {
+        require(orderIdtoOrder[orderId].seller == msg.sender, "You are not the seller.");
+
+
+        // Mark NFT as not listing
+        listing[orderIdtoOrder[orderId].tokenId] = false;
+
+        // Revoke approval by approve to zero address
+        approve(address(0), orderIdtoOrder[orderId].tokenId);
+
+        return true;
+    }
+
     // function buy
 
     // struct Product {
