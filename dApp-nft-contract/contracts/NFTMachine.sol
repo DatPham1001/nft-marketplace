@@ -89,9 +89,6 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     mapping(uint256 => Order) public orderIdtoOrder;
 
     Order[] AllOrders;
-    
-    // Mapping to store orders created by NFT owners
-    mapping(uint256 => Order) public orders;
 
     // A NFT is listing or not
     mapping(uint256 => bool) public listing;
@@ -121,8 +118,6 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         newOrder.tokenId = tokenId;
         newOrder.seller = msg.sender;
         newOrder.price = price;
-
-        orders[orderId] = newOrder;
 
         AllOrders.push(newOrder);
 
