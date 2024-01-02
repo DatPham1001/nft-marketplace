@@ -92,6 +92,11 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     // A NFT is listing or not
     mapping(uint256 => bool) public listing;
 
+    // function get all Orders
+    function getAllOrders() public view returns (Order[] memory) {
+        return AllOrders;
+    }
+
     // function create order
     function createOrder(IERC721 nftContract, uint256 tokenId, uint256 price) public returns(uint256) {
         address nftOwner = nftContract.ownerOf(tokenId);
