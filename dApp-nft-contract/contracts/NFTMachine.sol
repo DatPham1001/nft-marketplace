@@ -40,14 +40,15 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     mapping(uint256 => NFT) public tokenIdToNFT;
 
     // mapping tokenId to owner's address
-    mapping(uint256 => address) public tokenIdOwner;
+    // mapping(uint256 => address) public tokenIdOwner;
+    // user ownerOf()
 
     // mapping owner's address to a list of tokenId
     mapping (address => uint256[]) public userNFTCollection;
 
     // function mint new NFT
     function mintNewNFT(string memory attribute_url) public returns(uint256) {
-        require(msg.sender == owner(), "You are not owner");
+        require(msg.sender == owner(), "You are not owner.");
         uint256 tokenId = safeMint(owner(), attribute_url);
         // Save NFT
         NFT memory newNFT;
@@ -58,7 +59,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         AllNFTs.push(newNFT);
 
         // Set owner
-        tokenIdOwner[tokenId] = owner();
+        // tokenIdOwner[tokenId] = owner();
         userNFTCollection[owner()].push(tokenId);
 
         return tokenId;
@@ -144,21 +145,53 @@ contract NFTMachine is MyNFTToken(msg.sender) {
             if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
                 AllOrders[i] = AllOrders[AllOrders.length - 1];  
             }            
-            AllOrders.pop();
-}
+        }
+        AllOrders.pop();
 
         return true;
     }
 
     // function buy
-    // function buyItem(IERC721 nftContract, uint256 tokenId) public payable whenNotPaused returns (Order memory order) {
-    //     order = orderIdtoOrder[tokenId];
-    //     address seller = order.seller;
+    function buyItem(uint256 orderId) public payable returns (bool) {
+        Order memory order = orderIdtoOrder[orderId];
+        address seller = order.seller;
 
-    //     require(seller != address(0), "Invalid order.");
-    //     require(seller != msg.sender, "You cannot buy your NFT.");
-    //     require(order.price == msg.value, "The price is not correct.");
-    // }
+        require(seller != address(0), "Invalid order.");
+        require(seller != msg.sender, "You cannot buy your NFT.");
+        require(order.price == msg.value, "The price is not correct.");
+        require(seller == this.ownerOf(order.tokenId),"This was an old order. The seller is no longer the owner.");
+
+        // Transfer sale amount to seller
+        require(payable(seller).send(order.price), "Transfering the sale amount to the seller failed");
+
+        // Transfer asset owner
+        this.safeTransferFrom(seller, msg.sender, order.tokenId);
+
+        // Set owner
+        // tokenIdOwner[order.tokenId] = owner();
+        userNFTCollection[msg.sender].push(order.tokenId);
+
+        // Remove NFT from seller list
+        for (uint i = 0; i < userNFTCollection[seller].length - 1; i++) {
+            if (userNFTCollection[seller][i] == order.tokenId) {
+                userNFTCollection[seller][i] = userNFTCollection[seller][userNFTCollection[seller].length - 1];  
+            }               
+        }
+        userNFTCollection[seller].pop();
+
+        // Remove order
+        for (uint i = 0; i < AllOrders.length - 1; i++) {
+            if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
+                AllOrders[i] = AllOrders[AllOrders.length - 1];  
+            }            
+        }
+        AllOrders.pop();
+
+        // Mark NFT as not listing
+        listing[orderIdtoOrder[orderId].tokenId] = false;
+
+        return true;
+    }
 
 
     // struct Product {
