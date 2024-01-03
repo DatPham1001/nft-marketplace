@@ -41,7 +41,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // mapping tokenId to owner's address
     // mapping(uint256 => address) public tokenIdOwner;
-    // user ownerOf()
+    // use ownerOf()
 
     // mapping owner's address to a list of tokenId
     mapping (address => uint256[]) public userNFTCollection;
