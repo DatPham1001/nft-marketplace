@@ -84,11 +84,11 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         address seller;
         uint256 price;
     }
+
+    Order[] AllOrders;
     
     // mapping orderId to Order data
     mapping(uint256 => Order) public orderIdtoOrder;
-
-    Order[] AllOrders;
 
     // A NFT is listing or not
     mapping(uint256 => bool) public listing;
@@ -133,17 +133,33 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     function cancelOrder(uint256 orderId) public returns(bool) {
         require(orderIdtoOrder[orderId].seller == msg.sender, "You are not the seller.");
 
-
         // Mark NFT as not listing
         listing[orderIdtoOrder[orderId].tokenId] = false;
 
         // Revoke approval by approve to zero address
         approve(address(0), orderIdtoOrder[orderId].tokenId);
 
+        // Remove order
+        for (uint i = 0; i < AllOrders.length - 1; i++) {
+            if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
+                AllOrders[i] = AllOrders[AllOrders.length - 1];  
+            }            
+            AllOrders.pop();
+}
+
         return true;
     }
 
     // function buy
+    // function buyItem(IERC721 nftContract, uint256 tokenId) public payable whenNotPaused returns (Order memory order) {
+    //     order = orderIdtoOrder[tokenId];
+    //     address seller = order.seller;
+
+    //     require(seller != address(0), "Invalid order.");
+    //     require(seller != msg.sender, "You cannot buy your NFT.");
+    //     require(order.price == msg.value, "The price is not correct.");
+    // }
+
 
     // struct Product {
     //     uint256 tokenId;
