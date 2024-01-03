@@ -94,6 +94,8 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     // A NFT is listing or not
     mapping(uint256 => bool) public listing;
 
+    mapping(uint256 => Order) public tokenIdtoOrder;
+
     // function get all Orders
     function getAllOrders() public view returns (Order[] memory) {
         return AllOrders;
@@ -123,6 +125,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         AllOrders.push(newOrder);
 
         orderIdtoOrder[orderId] = newOrder;
+        tokenIdtoOrder[tokenId] = newOrder;
 
         // Mark NFT as listing
         listing[tokenId] = true;
@@ -141,6 +144,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         approve(address(0), orderIdtoOrder[orderId].tokenId);
 
         // Remove order
+        delete tokenIdtoOrder[orderIdtoOrder[orderId].tokenId];
         for (uint i = 0; i < AllOrders.length - 1; i++) {
             if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
                 AllOrders[i] = AllOrders[AllOrders.length - 1];  
@@ -180,6 +184,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         userNFTCollection[seller].pop();
 
         // Remove order
+        delete tokenIdtoOrder[orderIdtoOrder[orderId].tokenId];
         for (uint i = 0; i < AllOrders.length - 1; i++) {
             if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
                 AllOrders[i] = AllOrders[AllOrders.length - 1];  
