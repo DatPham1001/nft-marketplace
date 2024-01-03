@@ -8,7 +8,8 @@ import * as typechain from "nft-machine";
 import { log } from "console";
 import { Link, NavLink, Router } from "react-router-dom";
 import { NavBar } from "components/NavBar";
-import "../../styles/style.css"
+import "../../styles/style.css";
+import axios from "axios";
 interface Attribute {
   key: string;
   value: string;
@@ -72,7 +73,7 @@ const CreateNftPage = ({ params }) => {
       image: imageIpfsUri,
       attributes,
     };
-
+		console.log('nftData',nftData);
     // Upload data to IPFS
     const nftIpfsUri = await uploadToIpfs(JSON.stringify(nftData));
 
@@ -87,7 +88,14 @@ const CreateNftPage = ({ params }) => {
     // const ipfs = createIpfsClient();
     // const result = await ipfs.add(file);
     // return result.path;
-    return 'fakeIpfsUri';
+
+			try {
+				// const result = await axios.get("http://www.google.com")
+				// console.log(result.data);
+			} catch (error) {
+				console.error(error);
+			}
+
   };
 
   const mintNFT = (ipfsUri: string) => {
