@@ -77,7 +77,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // function transfer NFT
     // struct order
-    uint256 public _orderId = 0;
+    uint256 public _orderId = 1;
 
     struct Order {
         uint256 orderId;
