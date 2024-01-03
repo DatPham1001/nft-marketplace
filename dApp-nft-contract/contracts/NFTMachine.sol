@@ -83,7 +83,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         uint256 orderId;
         uint256 tokenId;
         address seller;
-        uint256 price;
+        uint256 priceInWei;
     }
 
     Order[] AllOrders;
@@ -101,7 +101,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // before creating order, user must call approve() to approve NFT to smartcontract address 
     // function create order
-    function createOrder(IERC721 nftContract, uint256 tokenId, uint256 price) public returns(uint256) {
+    function createOrder(IERC721 nftContract, uint256 tokenId, uint256 priceInWei) public returns(uint256) {
         address nftOwner = nftContract.ownerOf(tokenId);
         require(
             nftContract.getApproved(tokenId) == address(this) ||
@@ -109,7 +109,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
             "The contract is not authorized to manage the NFT."
         );
         require(ownerOf(tokenId) == msg.sender, "Only the NFT owner can create an order.");
-        require(price > 0, "Price must be greater than zero.");
+        require(priceInWei > 0, "Price must be greater than zero.");
         require(listing[tokenId] == false, "NFT is listing.");
 
         // Save order
@@ -118,7 +118,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         newOrder.orderId = orderId;
         newOrder.tokenId = tokenId;
         newOrder.seller = msg.sender;
-        newOrder.price = price;
+        newOrder.priceInWei = priceInWei;
 
         AllOrders.push(newOrder);
 
@@ -152,17 +152,17 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     }
 
     // function buy
-    function buyItem(uint256 orderId) public payable returns (bool) {
+    function buyNFT(uint256 orderId) public payable returns (bool) {
         Order memory order = orderIdtoOrder[orderId];
         address seller = order.seller;
 
         require(seller != address(0), "Invalid order.");
         require(seller != msg.sender, "You cannot buy your NFT.");
-        require(order.price == msg.value, "The price is not correct.");
+        require(order.priceInWei == msg.value, "The price is not correct.");
         require(seller == this.ownerOf(order.tokenId),"This was an old order. The seller is no longer the owner.");
 
         // Transfer sale amount to seller
-        require(payable(seller).send(order.price), "Transfering the sale amount to the seller failed");
+        require(payable(seller).send(order.priceInWei), "Transfering the sale amount to the seller failed");
 
         // Transfer asset owner
         this.safeTransferFrom(seller, msg.sender, order.tokenId);
