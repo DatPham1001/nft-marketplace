@@ -103,11 +103,11 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // before creating order, user must call approve() to approve NFT to smartcontract address 
     // function create order
-    function createOrder(IERC721 nftContract, uint256 tokenId, uint256 priceInWei) public returns(uint256) {
-        address nftOwner = nftContract.ownerOf(tokenId);
+    function createOrder(uint256 tokenId, uint256 priceInWei) public returns(uint256) {
+        address nftOwner = this.ownerOf(tokenId);
         require(
-            nftContract.getApproved(tokenId) == address(this) ||
-                nftContract.isApprovedForAll(nftOwner, address(this)),
+            this.getApproved(tokenId) == address(this) ||
+                this.isApprovedForAll(nftOwner, address(this)),
             "The contract is not authorized to manage the NFT."
         );
         require(ownerOf(tokenId) == msg.sender, "Only the NFT owner can create an order.");
