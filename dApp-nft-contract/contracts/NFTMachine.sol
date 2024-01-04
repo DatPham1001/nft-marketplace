@@ -14,12 +14,59 @@ import "./MyNFTToken.sol";
 // error PriceMustBeAboveZero();
 
 contract NFTMachine is MyNFTToken(msg.sender) {
-    address public erc20Address;
+    uint256 public _feeInWei;
+
+    // function set fee
+    function setFee(uint256 newFeeInWei) public returns(bool) {
+        require(msg.sender == owner(), "Only owner can set Fee.");
+        
+        _feeInWei = newFeeInWei;
+
+        return true;
+    }
+
+    // address public erc20Address;
     // struct NFT
     // struct NFTAttribute {
     //     string key;
     //     string value;
     // }
+
+    // check if a address is admin or not
+    mapping(address => bool) public isAdmin;
+
+    address[] allAdmins;
+
+    // function get all Admins
+    function getAllAdmin() public view returns (address[] memory) {
+        return allAdmins;
+    }
+
+    // function add new Admin
+    function addAdmin(address newAdmin) public returns(bool) {
+        require(msg.sender == owner(), "Only owner can add new admin");
+        
+        isAdmin[newAdmin] = true;
+        allAdmins.push(newAdmin);
+
+        return true;
+    }
+
+    // function remove Admin
+    function removeAdmin(address adminAddress) public returns(bool) {
+        require(msg.sender == owner(), "Only owner can add new admin");
+        
+        // Remove order
+        delete isAdmin[adminAddress];
+        for (uint i = 0; i < allAdmins.length - 1; i++) {
+            if (allAdmins[i] == adminAddress) {
+                allAdmins[i] = allAdmins[allAdmins.length - 1];  
+            }            
+        }
+        allAdmins.pop();
+
+        return true;
+    }
 
     struct NFT {
         uint256 tokenId; // maybe removed
@@ -48,7 +95,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // function mint new NFT
     function mintNewNFT(string memory attribute_url) public returns(uint256) {
-        require(msg.sender == owner(), "You are not owner.");
+        require(msg.sender == owner() || isAdmin[msg.sender], "Only owner/admin can mint new NFT.");
         uint256 tokenId = safeMint(owner(), attribute_url);
         // Save NFT
         NFT memory newNFT;
@@ -166,7 +213,9 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         require(seller == this.ownerOf(order.tokenId),"This was an old order. The seller is no longer the owner.");
 
         // Transfer sale amount to seller
-        require(payable(seller).send(order.priceInWei), "Transfering the sale amount to the seller failed");
+        require(payable(seller).send(order.priceInWei - _feeInWei), "Transfering the sale amount to the seller failed.");
+         // Transfer fee to owner
+        require(payable(owner()).send(_feeInWei), "Transfering the fee to the owner failed.");
 
         // Transfer asset owner
         this.safeTransferFrom(seller, msg.sender, order.tokenId);

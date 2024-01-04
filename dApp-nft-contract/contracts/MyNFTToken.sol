@@ -13,7 +13,7 @@ contract MyNFTToken is ERC721, ERC721URIStorage, Ownable {
     IERC20 public paymentToken;
 
     uint256 public nextTokenId;
-    uint256 public listingFee;
+    // uint256 public listingFee;
 
     constructor(
         address initialOwner
