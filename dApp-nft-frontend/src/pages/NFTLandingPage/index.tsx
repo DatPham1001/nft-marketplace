@@ -13,7 +13,7 @@ import { NavBar } from "components/NavBar";
 const NFTLandingPagePage = ({ params }) => {
   // const [machine, setmachine] = useState();
   // const [baseImageUrl, setbaseImageUrl] = useState(params.baseImageUrl);
-  const machine = params.machine;
+  const marketPlaceContract = params.marketPlaceContract;
   const baseImgUrl = params.baseImgUrl;
   const [listNft, setListNft] = useState([]);
   const [isLoading, setIsLoading] = useState([])
@@ -25,44 +25,46 @@ const NFTLandingPagePage = ({ params }) => {
     let list = [];
 
     try {
-
-      const nftList = await machine.getAllNFT();
-
-      let arr = [];
-      //       nftList.map(async (e) => {
-      //         const uri = e[2].toString();
-      //         // arr.push(fetch(uri))
-      // // const 
-
-      //       });
-      //       const arrResponse = await Promise.all(arr);
-      //       arrResponse.map((e, index) => {
-      //         const tokenId = nftList[index][0].toString();
-      //         const price = nftList[index][1].toString();
-      //         const metadata = e.json();
-      //         list.push({
-      //           name: metadata.name,
-      //           tokenId: tokenId || "",
-      //           price: price || "",
-      //           img: metadata?.imgUrl,
-      //         });
-      //       })
+      const nftList = await marketPlaceContract.methods.getAllNFT().call();
+      console.log(nftList);
       let nfts = [];
-      const removeIds = ["0", "1", "2", "3", "4", "5"];
+      // nftList.map(async (e) => {
+      //   const uri = e.attribute_url;
+      //   try {
+      //     const response = await fetch(uri);
+      //     const metadata = await response.json();
+      //     console.log(metadata);
+      //     nfts.push({
+      //       name: metadata.name,
+      //       tokenId: e.tokenId,
+      //       img: metadata.image,
+      //       attributes: metadata.attributes
+      //     });
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // })
+      // setListNft(nfts.slice())
+      // console.log(nfts);
+      // } catch (error) {
+      //   console.log(error);
+      // }
+      const removeIds = [];
       for (const nft of nftList) {
         const tokenId = nft[0].toString();
         if (removeIds.includes(tokenId))
           continue
-        const price = nft[1].toString();
-        const uri = nft[2].toString();
+        console.log(nft);
+        
+        const uri = nft.attribute_url;
         try {
           const response = await fetch(uri);
           const metadata = await response.json();
           nfts.push({
             name: metadata.name,
             tokenId: tokenId,
-            price: price,
             img: metadata.image,
+            attributes: metadata.attributes
           });
         } catch (error) {
           console.log(error);
@@ -73,7 +75,6 @@ const NFTLandingPagePage = ({ params }) => {
     } catch (error) {
       console.log(error);
     }
-
 
   };
 

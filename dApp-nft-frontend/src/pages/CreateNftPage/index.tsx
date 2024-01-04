@@ -13,17 +13,28 @@ interface Attribute {
   key: string;
   value: string;
 }
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import FormData from 'form-data';
+import axios from 'axios';
+import ConfigFile from "../../../config.json";
 const CreateNftPage = ({ params }) => {
   // const [machine, setmachine] = useState();
   // const [baseImageUrl, setbaseImageUrl] = useState(params.baseImageUrl);
-  const machine = params.machine;
-  const baseImgUrl = params.baseImgUrl;
+  const marketPlaceContract = params.marketPlaceContract;
+  const baseImgUrl = ConfigFile.baseImgUrl;
   const [listNft, setListNft] = useState([]);
   const [isLoading, setIsLoading] = useState([])
-
+  const [mintError, setMintError] = useState("");
+  const [transactionHash, setTransactionHash] = useState();
+  const [loading, setLoading] = useState(false);
+  const [accounts, setAccounts] = useState([]);
   useEffect(() => {
-
+    window.ethereum
+      .request({ method: 'eth_requestAccounts', })
+      .then((accounts) => {
+        setAccounts(accounts)
+      })
   }, []);
 
   const [name, setName] = useState<string>('');
@@ -55,7 +66,9 @@ const CreateNftPage = ({ params }) => {
   const handleAddAttribute = () => {
     setAttributes([...attributes, { key: '', value: '' }]);
   };
-
+  function isNotNullOrEmpty(value) {
+    return value !== undefined && value !== null && value !== '';
+  }
   const handleRemoveAttribute = (index: number) => {
     const newAttributes = [...attributes];
     newAttributes.splice(index, 1);
@@ -64,38 +77,125 @@ const CreateNftPage = ({ params }) => {
 
   const handleCreateNFT = async () => {
     // Upload image to IPFS
-    const imageIpfsUri = await uploadToIpfs(imageFile);
+    try {
+      let loadingToastId;
+      setLoading(true);
+      if (!params.web3.currentProvider || !params.web3.currentProvider.isConnected()) {
+        throw new Error('Please connect to your wallet');
+      }
+      console.log(accounts[0]);
+      if (accounts[0].toLowerCase() != ConfigFile.minter.toLowerCase()) {
+        throw new Error('You do not have permission to create NFT');
+      }
+      if (!isNotNullOrEmpty(name)) {
+        throw new Error('Name is required');
+      }
 
-    // Prepare data for IPFS
-    const nftData = {
-      name,
-      image: imageIpfsUri,
-      attributes,
-    };
+      if (!isNotNullOrEmpty(imageFile)) {
+        throw new Error('Image is required');
+      }
 
-    // Upload data to IPFS
-    const nftIpfsUri = await uploadToIpfs(JSON.stringify(nftData));
-
-    // Call the mint NFT function with the IPFS URI
-    mintNFT(nftIpfsUri);
+      loadingToastId = toast.info('Uploading Image to IPFS...', { position: 'bottom-right', autoClose: false });
+      const imageIpfsUri = await uploadImageToIpfs(imageFile);
+      // Prepare data for IPFS
+      const nftData = {
+        name,
+        image: params.baseImgUrl + imageIpfsUri,
+        attributes,
+      };
+      // Upload data to IPFS
+      toast.dismiss(loadingToastId);
+      loadingToastId = toast.info('Uploading data to IPFS...', { position: 'bottom-right', autoClose: false });
+      const nftIpfsUri = await pinJSONToIPFS(nftData);
+      const mintingParameters = {
+        from: accounts[0], // Wallet address that will initiate the transaction
+        gas: 2000000, // Adjust gas according to your contract requirements
+      };
+      toast.dismiss(loadingToastId);
+      toast.info('Minting...', { position: 'bottom-right', autoClose: false });
+      // // // Call the mint NFT function with the IPFS URI
+      console.log(marketPlaceContract.methods);
+      const mintResult = await marketPlaceContract.methods.mintNewNFT(baseImgUrl + nftIpfsUri).send(mintingParameters);
+      console.log(mintResult);
+      setMintError(null);
+      setTransactionHash(mintResult.transactionHash);
+      // Show success notification
+      toast.dismiss(loadingToastId);
+      toast.success('NFT minted successfully!', { position: 'bottom-right' });
+      setLoading(false);
+    } catch (error) {
+      // An error occurred during the transaction
+      toast.dismiss();
+      setLoading(false);
+      console.error(error);
+      toast.error(error.message, { position: 'bottom-right' });
+      if (error.error.code != 200) {
+        setMintError(error.error.message);
+      } else
+        setMintError('Failed to mint NFT. Please check the console for details.');
+      setTransactionHash(null);
+      toast.error(error.error.message, { position: 'bottom-right' });
+    }
   };
 
-  const uploadToIpfs = async (file: File | null) => {
-    // Implementation for uploading to IPFS goes here
-    // You can use libraries like ipfs-http-client or any other IPFS library
-    // Example:
-    // const ipfs = createIpfsClient();
-    // const result = await ipfs.add(file);
-    // return result.path;
-    return 'fakeIpfsUri';
-  };
+  const uploadImageToIpfs = async (file: File | null) => {
+    const formData = new FormData();
+    // Assuming 'file' is an instance of the File class
+    formData.append('file', file);
 
-  const mintNFT = (ipfsUri: string) => {
-    // Implement the mint NFT function to upload data to the blockchain
-    // This function will be specific to the blockchain you are using
-    // Example:
-    // blockchainMintFunction(ipfsUri);
+    const pinataMetadata = JSON.stringify({
+      name: 'File name',
+    });
+    formData.append('pinataMetadata', pinataMetadata);
+
+    const pinataOptions = JSON.stringify({
+      cidVersion: 0,
+    });
+    formData.append('pinataOptions', pinataOptions);
+    formData.forEach((value, key) => {
+      console.log(`Key: ${key}, Value: ${value}`);
+    });
+    // try {
+    const res = await axios.post(
+      'https://api.pinata.cloud/pinning/pinFileToIPFS',
+      formData,
+      {
+        maxBodyLength: 'Infinity',
+        headers: {
+          'Content-Type': `multipart/form-data; boundary=${formData.getBoundary}`,
+          Authorization: `Bearer ${params.pinataJwt}`,
+        },
+      }
+    );
+    console.log(res.data);
+    return res.data.IpfsHash;
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
+  const pinJSONToIPFS = async (nftData) => {
+
+    const data = JSON.stringify({
+      pinataContent: nftData,
+      pinataMetadata: {
+        name: "metadata.json"
+      }
+    })
+    console.log(data);
+
+    // try {
+    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", data, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${params.pinataJwt}`
+      }
+    });
+    console.log(res.data);
+    return res.data.IpfsHash
+    // } catch (error) {
+    // console.log(error);
+    // }
+  }
 
 
   return (
@@ -191,15 +291,25 @@ const CreateNftPage = ({ params }) => {
             )}
           </label>
         </div>
+        {
+          // !loading && 
+          <button
+            type="button"
+            onClick={handleCreateNFT}
+            disabled={loading}
+            style={{
+              backgroundColor: loading ? '#ccc' : '',
+              cursor: loading ? 'not-allowed' : 'pointer',
+            }}
+            className="bg-pink-500 text-white rounded-md p-2 mt-4 col-span-3"
+          >
+            Create NFT
+          </button>
+        }
 
-
-        <button
-          type="button"
-          onClick={handleCreateNFT}
-          className="bg-pink-500 text-white rounded-md p-2 mt-4 col-span-3"
-        >
-          Create NFT
-        </button>
+        {/* {transactionHash && <p>Transaction Hash: {transactionHash}</p>} */}
+        {/* {mintError && <p style={{ color: 'red' }}>{mintError}</p>} */}
+        <ToastContainer />
       </div>
 
     </>
