@@ -18,6 +18,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import FormData from 'form-data';
 import axios from 'axios';
 import ConfigFile from "../../../config.json";
+import { useNavigate } from 'react-router-dom';
 const CreateNftPage = ({ params }) => {
   // const [machine, setmachine] = useState();
   // const [baseImageUrl, setbaseImageUrl] = useState(params.baseImageUrl);
@@ -29,6 +30,7 @@ const CreateNftPage = ({ params }) => {
   const [transactionHash, setTransactionHash] = useState();
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState([]);
+  const navigateTo = useNavigate();
   useEffect(() => {
     window.ethereum
       .request({ method: 'eth_requestAccounts', })
@@ -80,7 +82,7 @@ const CreateNftPage = ({ params }) => {
     try {
       let loadingToastId;
       setLoading(true);
-      if (!params.web3.currentProvider || !params.web3.currentProvider.isConnected()) {
+      if (accounts.length == 0) {
         throw new Error('Please connect to your wallet');
       }
       console.log(accounts[0]);
@@ -122,6 +124,9 @@ const CreateNftPage = ({ params }) => {
       // Show success notification
       toast.dismiss(loadingToastId);
       toast.success('NFT minted successfully!', { position: 'bottom-right' });
+      setTimeout(() => {
+        navigateTo('/');
+      }, 2000);
       setLoading(false);
     } catch (error) {
       // An error occurred during the transaction
