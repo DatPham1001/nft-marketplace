@@ -14,6 +14,17 @@ import "./MyNFTToken.sol";
 // error PriceMustBeAboveZero();
 
 contract NFTMachine is MyNFTToken(msg.sender) {
+    uint256 public _listingFee;
+
+    // function set fee
+    function setFee(uint256 newFee) public returns(bool) {
+        require(msg.sender == owner(), "Only owner can set Fee.");
+        
+        _listingFee = newFee;
+
+        return true;
+    }
+
     // address public erc20Address;
     // struct NFT
     // struct NFTAttribute {
@@ -202,7 +213,9 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         require(seller == this.ownerOf(order.tokenId),"This was an old order. The seller is no longer the owner.");
 
         // Transfer sale amount to seller
-        require(payable(seller).send(order.priceInWei), "Transfering the sale amount to the seller failed");
+        require(payable(seller).send(order.priceInWei - _listingFee), "Transfering the sale amount to the seller failed.");
+         // Transfer fee to owner
+        require(payable(owner()).send(_listingFee), "Transfering the fee to the owner failed.");
 
         // Transfer asset owner
         this.safeTransferFrom(seller, msg.sender, order.tokenId);
