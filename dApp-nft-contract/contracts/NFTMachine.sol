@@ -14,57 +14,116 @@ import "./MyNFTToken.sol";
 // error PriceMustBeAboveZero();
 
 contract NFTMachine is MyNFTToken(msg.sender) {
+     constructor() {
+        //Add default NFTs
+        AllNFTs.push(
+            NFT({
+                tokenId: 9999999999,
+                attribute_url: "https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft2.json"
+            })
+        );
+        AllNFTs.push(
+            NFT({
+                tokenId: 99999999991,
+                attribute_url: "https://ipfs.io/ipfs/QmW2Ethso9Bp3bDkTNyfwecypkKd79viyV7WH2rMTJhDAU"
+            })
+        );
+        AllNFTs.push(
+            NFT({
+                tokenId: 99999999992,
+                attribute_url: "https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft1.json"
+            })
+        );
+        //Add default admin
+        allAdmins.push(
+            Admin({
+                adminAddress: address(
+                    0xc2170Ecc545428dD909211bfB9890D26D29f0885
+                ),
+                adminName: "Dat Pham Admin 1",
+                status: "Y"
+            })
+        );
+
+        allAdmins.push(
+            Admin({
+                adminAddress: address(
+                    0x7493e77B6C2b9c550A6Fe4C392A24E1452EE65f1
+                ),
+                adminName: "Dat Pham Admin 2",
+                status: "Y"
+            })
+        );
+    }
+
     uint256 public _feeInWei;
 
     // function set fee
-    function setFee(uint256 newFeeInWei) public returns(bool) {
-        require(msg.sender == owner(), "Only owner can set Fee.");
-        
+    function setFee(uint256 newFeeInWei) public onlyOwner returns (bool) {
+        // require(msg.sender == owner(), "Only owner can set Fee.");
+
         _feeInWei = newFeeInWei;
 
         return true;
     }
 
-    // address public erc20Address;
-    // struct NFT
-    // struct NFTAttribute {
-    //     string key;
-    //     string value;
-    // }
-
     // check if a address is admin or not
     mapping(address => bool) public isAdmin;
-
-    address[] allAdmins;
+    struct Admin {
+        address adminAddress;
+        string adminName;
+        string status;
+    }
+    Admin[] allAdmins;
 
     // function get all Admins
-    function getAllAdmin() public view returns (address[] memory) {
+    function getAllAdmin() public view returns (Admin[] memory) {
         return allAdmins;
     }
 
     // function add new Admin
-    function addAdmin(address newAdmin) public returns(bool) {
-        require(msg.sender == owner(), "Only owner can add new admin");
-        
-        isAdmin[newAdmin] = true;
-        allAdmins.push(newAdmin);
+    function addAdmin(address newAdminAddress, string memory name)
+        public
+        onlyOwner
+        returns (bool)
+    {
+        // require(msg.sender == owner(), "Only owner can add new admin");
+
+        require(!isAdmin[newAdminAddress], "Admin already exists");
+        require(bytes(name).length > 0, "Invalid admin name");
+
+        isAdmin[newAdminAddress] = true;
+        allAdmins.push(
+            Admin({adminAddress: newAdminAddress, adminName: name, status: "Y"})
+        );
 
         return true;
     }
 
     // function remove Admin
-    function removeAdmin(address adminAddress) public returns(bool) {
-        require(msg.sender == owner(), "Only owner can add new admin");
-        
-        // Remove order
+    function removeAdmin(address adminAddress) public onlyOwner returns (bool) {
+        // require(msg.sender == owner(), "Only owner can add new admin");
         delete isAdmin[adminAddress];
-        for (uint i = 0; i < allAdmins.length - 1; i++) {
-            if (allAdmins[i] == adminAddress) {
-                allAdmins[i] = allAdmins[allAdmins.length - 1];  
-            }            
+        for (uint256 i = 0; i < allAdmins.length - 1; i++) {
+            if (allAdmins[i].adminAddress == adminAddress) {
+                allAdmins[i] = allAdmins[allAdmins.length - 1];
+            }
         }
         allAdmins.pop();
+        return true;
+    }
 
+    function deactivateAdmin(address adminAddress)
+        public
+        onlyOwner
+        returns (bool)
+    {
+        for (uint256 i = 0; i < allAdmins.length; i++) {
+            if (allAdmins[i].adminAddress == adminAddress) {
+                allAdmins[i].status = "N";
+                break;
+            }
+        }
         return true;
     }
 
@@ -91,11 +150,14 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     // use ownerOf()
 
     // mapping owner's address to a list of tokenId
-    mapping (address => uint256[]) public userNFTCollection;
+    mapping(address => uint256[]) public userNFTCollection;
 
     // function mint new NFT
-    function mintNewNFT(string memory attribute_url) public returns(uint256) {
-        require(msg.sender == owner() || isAdmin[msg.sender], "Only owner/admin can mint new NFT.");
+    function mintNewNFT(string memory attribute_url) public returns (uint256) {
+        require(
+            msg.sender == owner() || isAdmin[msg.sender],
+            "Only owner/admin can mint new NFT."
+        );
         uint256 tokenId = safeMint(owner(), attribute_url);
         // Save NFT
         NFT memory newNFT;
@@ -113,10 +175,16 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     }
 
     // function get owner's all NFT
-    function getOwnerNFT(address owner_address) public view returns (NFT[] memory) {
-        NFT[] memory owner_NFT = new NFT[](userNFTCollection[owner_address].length);
-        
-        for (uint i=0; i < userNFTCollection[owner_address].length; i++) {
+    function getOwnerNFT(address owner_address)
+        public
+        view
+        returns (NFT[] memory)
+    {
+        NFT[] memory owner_NFT = new NFT[](
+            userNFTCollection[owner_address].length
+        );
+
+        for (uint256 i = 0; i < userNFTCollection[owner_address].length; i++) {
             owner_NFT[i] = tokenIdToNFT[userNFTCollection[owner_address][i]];
         }
         return owner_NFT;
@@ -134,7 +202,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     }
 
     Order[] AllOrders;
-    
+
     // mapping orderId to Order data
     mapping(uint256 => Order) public orderIdtoOrder;
 
@@ -148,16 +216,22 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         return AllOrders;
     }
 
-    // before creating order, user must call approve() to approve NFT to smartcontract address 
+    // before creating order, user must call approve() to approve NFT to smartcontract address
     // function create order
-    function createOrder(uint256 tokenId, uint256 priceInWei) public returns(uint256) {
+    function createOrder(uint256 tokenId, uint256 priceInWei)
+        public
+        returns (uint256)
+    {
         address nftOwner = this.ownerOf(tokenId);
         require(
             this.getApproved(tokenId) == address(this) ||
                 this.isApprovedForAll(nftOwner, address(this)),
             "The contract is not authorized to manage the NFT."
         );
-        require(ownerOf(tokenId) == msg.sender, "Only the NFT owner can create an order.");
+        require(
+            ownerOf(tokenId) == msg.sender,
+            "Only the NFT owner can create an order."
+        );
         require(priceInWei > 0, "Price must be greater than zero.");
         require(listing[tokenId] == false, "NFT is listing.");
 
@@ -180,9 +254,12 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         return orderId;
     }
 
-    // function cancel order 
-    function cancelOrder(uint256 orderId) public returns(bool) {
-        require(orderIdtoOrder[orderId].seller == msg.sender, "You are not the seller.");
+    // function cancel order
+    function cancelOrder(uint256 orderId) public returns (bool) {
+        require(
+            orderIdtoOrder[orderId].seller == msg.sender,
+            "You are not the seller."
+        );
 
         // Mark NFT as not listing
         listing[orderIdtoOrder[orderId].tokenId] = false;
@@ -192,10 +269,10 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
         // Remove order
         delete tokenIdtoOrder[orderIdtoOrder[orderId].tokenId];
-        for (uint i = 0; i < AllOrders.length - 1; i++) {
+        for (uint256 i = 0; i < AllOrders.length - 1; i++) {
             if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
-                AllOrders[i] = AllOrders[AllOrders.length - 1];  
-            }            
+                AllOrders[i] = AllOrders[AllOrders.length - 1];
+            }
         }
         AllOrders.pop();
 
@@ -210,12 +287,21 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         require(seller != address(0), "Invalid order.");
         require(seller != msg.sender, "You cannot buy your NFT.");
         require(order.priceInWei == msg.value, "The price is not correct.");
-        require(seller == this.ownerOf(order.tokenId),"This was an old order. The seller is no longer the owner.");
+        require(
+            seller == this.ownerOf(order.tokenId),
+            "This was an old order. The seller is no longer the owner."
+        );
 
         // Transfer sale amount to seller
-        require(payable(seller).send(order.priceInWei - _feeInWei), "Transfering the sale amount to the seller failed.");
-         // Transfer fee to owner
-        require(payable(owner()).send(_feeInWei), "Transfering the fee to the owner failed.");
+        require(
+            payable(seller).send(order.priceInWei - _feeInWei),
+            "Transfering the sale amount to the seller failed."
+        );
+        // Transfer fee to owner
+        require(
+            payable(owner()).send(_feeInWei),
+            "Transfering the fee to the owner failed."
+        );
 
         // Transfer asset owner
         this.safeTransferFrom(seller, msg.sender, order.tokenId);
@@ -225,19 +311,21 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         userNFTCollection[msg.sender].push(order.tokenId);
 
         // Remove NFT from seller list
-        for (uint i = 0; i < userNFTCollection[seller].length - 1; i++) {
+        for (uint256 i = 0; i < userNFTCollection[seller].length - 1; i++) {
             if (userNFTCollection[seller][i] == order.tokenId) {
-                userNFTCollection[seller][i] = userNFTCollection[seller][userNFTCollection[seller].length - 1];  
-            }               
+                userNFTCollection[seller][i] = userNFTCollection[seller][
+                    userNFTCollection[seller].length - 1
+                ];
+            }
         }
         userNFTCollection[seller].pop();
 
         // Remove order
         delete tokenIdtoOrder[orderIdtoOrder[orderId].tokenId];
-        for (uint i = 0; i < AllOrders.length - 1; i++) {
+        for (uint256 i = 0; i < AllOrders.length - 1; i++) {
             if (AllOrders[i].tokenId == orderIdtoOrder[orderId].tokenId) {
-                AllOrders[i] = AllOrders[AllOrders.length - 1];  
-            }            
+                AllOrders[i] = AllOrders[AllOrders.length - 1];
+            }
         }
         AllOrders.pop();
 
@@ -246,7 +334,6 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
         return true;
     }
-
 
     // struct Product {
     //     uint256 tokenId;
@@ -459,5 +546,5 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     // function getAllOrders() public view returns (Order[] memory) {
     //     return orders;
     // }
-// }
+    // }
 }

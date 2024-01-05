@@ -3,6 +3,30 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "newAdminAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "addAdmin",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "to",
 				"type": "address"
 			},
@@ -15,6 +39,25 @@
 		"name": "approve",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "orderId",
+				"type": "uint256"
+			}
+		],
+		"name": "buyNFT",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -39,18 +82,13 @@
 	{
 		"inputs": [
 			{
-				"internalType": "contract IERC721",
-				"name": "nftContract",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
 				"name": "tokenId",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "price",
+				"name": "priceInWei",
 				"type": "uint256"
 			}
 		],
@@ -60,6 +98,25 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "adminAddress",
+				"type": "address"
+			}
+		],
+		"name": "deactivateAdmin",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -311,6 +368,25 @@
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "adminAddress",
+				"type": "address"
+			}
+		],
+		"name": "removeAdmin",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
@@ -411,6 +487,25 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "newFeeInWei",
+				"type": "uint256"
+			}
+		],
+		"name": "setFee",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -473,6 +568,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "_feeInWei",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "_orderId",
 		"outputs": [
 			{
@@ -505,12 +613,29 @@
 	},
 	{
 		"inputs": [],
-		"name": "erc20Address",
+		"name": "getAllAdmin",
 		"outputs": [
 			{
-				"internalType": "address",
+				"components": [
+					{
+						"internalType": "address",
+						"name": "adminAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "adminName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "status",
+						"type": "string"
+					}
+				],
+				"internalType": "struct NFTMachine.Admin[]",
 				"name": "",
-				"type": "address"
+				"type": "tuple[]"
 			}
 		],
 		"stateMutability": "view",
@@ -564,7 +689,7 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "price",
+						"name": "priceInWei",
 						"type": "uint256"
 					}
 				],
@@ -630,6 +755,25 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "isAdmin",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "owner",
 				"type": "address"
 			},
@@ -664,19 +808,6 @@
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "listingFee",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -748,7 +879,7 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "price",
+				"name": "priceInWei",
 				"type": "uint256"
 			}
 		],
@@ -840,12 +971,17 @@
 				"type": "uint256"
 			}
 		],
-		"name": "tokenIdOwner",
+		"name": "tokenIdToNFT",
 		"outputs": [
 			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "attribute_url",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -859,17 +995,27 @@
 				"type": "uint256"
 			}
 		],
-		"name": "tokenIdToNFT",
+		"name": "tokenIdtoOrder",
 		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "orderId",
+				"type": "uint256"
+			},
 			{
 				"internalType": "uint256",
 				"name": "tokenId",
 				"type": "uint256"
 			},
 			{
-				"internalType": "string",
-				"name": "attribute_url",
-				"type": "string"
+				"internalType": "address",
+				"name": "seller",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "priceInWei",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -919,4 +1065,3 @@
 		"type": "function"
 	}
 ]
-

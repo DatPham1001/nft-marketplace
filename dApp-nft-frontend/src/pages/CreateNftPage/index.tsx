@@ -224,10 +224,10 @@ const CreateNftPage = ({ params }) => {
                 NFT
               </Text>
             </div>
-            <NavBar></NavBar>
+            <NavBar/>
           </div>
         </div>
-      </div>
+      </div >
       <div className="font-poppins gap-16 md:gap-5 grid sm:grid-cols-1 md:grid-cols-2 grid-cols-3 min-h-[auto] mt-[248px] w-[91%] mx-auto bg-pink-100 p-8 rounded-lg shadow-lg">
         <div className="col-span-1">
           <label className="text-xl text-pink-800 mb-2 block">

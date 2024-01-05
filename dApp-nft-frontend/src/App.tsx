@@ -14,6 +14,7 @@ import { NavBar } from "components/NavBar";
 import CreateNftPage from "pages/CreateNftPage";
 import ContractABI from "../contractdata/ContractABI.json"
 import ConfigFile from "../config.json"
+import AdminManagerPage from "pages/AdminManagerPage";
 // const nftTokenContract = "0x9C3fc11735c3B754CCa9e5FCe6a4aa4E8e4544ab"
 // const machineContract = "0x53aeBBE1db026eA25a67Fe644d0E94Fa96a1aCb1"
 // const minter = "0x392d672E6E4ba33e8AEe46C5A9e7B87d3c802A32"
@@ -56,6 +57,7 @@ function App() {
           <Routes>
             <Route path="/" element={<NFTLandingPagePage params={params} />} />
             <Route path="/createNft" element={<CreateNftPage params={params} />} />
+            <Route path="/admin-manager" element={<AdminManagerPage params={params} />} />
             {/* <Route path="/create" element={
                 <Create marketplace={marketplace} nft={nft} />
               } />
