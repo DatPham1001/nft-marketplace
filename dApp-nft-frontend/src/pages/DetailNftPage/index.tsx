@@ -5,11 +5,11 @@ import ABI from "contractABI.json";
 import { Button, Img, Text } from "components";
 import { useAccount, useSDK } from '@metamask/sdk-react-ui';
 
-const machineContract = "0xdb312b182Bf82072A0a1375faA08f591959E4414";
-const DetailNFT = () => {
-	const params = useParams()
+const DetailNFT = ({ params }) => {
+	const parameter = useParams()
 	const [data, setData] = useState(null)
 	const {address} = useAccount();
+	const machineContract = params.contractAddress;
 	useEffect(() => {
 		const getNFTsListOrder = async () => {
 			try {
@@ -25,21 +25,22 @@ const DetailNFT = () => {
 				// console.log(nftList);
 				const rpcUrl = 'https://rpc.sepolia.org';
 				const provider = new ethers.providers.JsonRpcProvider(rpcUrl || window.ethereum as any)
+
 				const contractNFT = new ethers.Contract(
 					machineContract,
 					ABI,
 					provider,
 				)
-				const nft = await contractNFT.orderIdtoOrder(params.id)
+				const nft = await contractNFT.orderIdtoOrder(parameter.id)
 				console.log('nft', nft);
 				const orderId = nft['orderId'].toString();
 				const tokenId = nft['tokenId'].toString();
 				const seller = nft['seller'].toString();
-				const price = nft['price'].toString();
+				const priceInWei = nft['priceInWei'].toString();
 				setData({
 					tokenId: tokenId,
 					orderId: orderId,
-					price: price,
+					priceInWei: priceInWei,
 					seller: seller
 				})
 			} catch (error) {
@@ -51,15 +52,19 @@ const DetailNFT = () => {
 	const buyNFT = async () => {
 		try {
 			const rpcUrl = 'https://rpc.sepolia.org';
-			const provider = new ethers.providers.JsonRpcProvider(rpcUrl || window.ethereum as any)
+			const provider = new ethers.providers.JsonRpcProvider(rpcUrl || window.ethereum as any);
+			// await provider.send('eth_requestAccounts', []);
+			// const wallet = new ethers.Wallet(privkey, provider);
+			// const signer = wallet.provider.getSigner();
 			const contractNFT = new ethers.Contract(
 				machineContract,
 				ABI,
 				provider,
 			)
+			console.log('contractNFT',contractNFT);
 			const nft = await contractNFT.buyNFT(data.orderId);
 				//  const nft = await contractNFT.getAllOrders();
-			console.log('nft',nft);
+			
 		} catch (error) {
 			console.log(error);
 		}
@@ -123,7 +128,7 @@ const DetailNFT = () => {
 							size="txtPoppinsMedium15"
 						>
 							<span className="text-gray-900 font-poppins text-left font-medium">
-								{data?.price}
+								{data?.priceInWei}
 							</span>
 						</Text>
 					</div>

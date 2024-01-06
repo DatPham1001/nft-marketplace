@@ -8,16 +8,16 @@ import { ethers } from "ethers";
 import ABI from "contractABI.json";
 import { useNavigate } from "react-router-dom";
 
-const machineContract = "0xdb312b182Bf82072A0a1375faA08f591959E4414";
 //0xD4a77Bb3BeEaC1B0CE92d465Fb34c50Eacd8355E
 //0x871010B2E49aCBfd0D1b9cbe28389c92d09f117B
 //0xdb312b182Bf82072A0a1375faA08f591959E4414
-const erc20Contract = "0xA80Bc339a70711d8a288d8d284857A47d1081E41";
-const minter = "0x35DAb71CF51B02e130F5030799479748EA3da269";
-const NFTListOrder: React.FC = () => {
+// const erc20Contract = "0xA80Bc339a70711d8a288d8d284857A47d1081E41";
+// const minter = "0x35DAb71CF51B02e130F5030799479748EA3da269";
+const NFTListOrder = ({params}) => {
 	const navigate = useNavigate()
 	const [listNft, setListNft] = useState([]);
-
+	const machineContract = params.contractAddress;
+  const marketPlaceContract = params.marketPlaceContract;
 	useEffect(() => {
 		getNFTsListOrder();
 	}, []);
@@ -40,17 +40,19 @@ const NFTListOrder: React.FC = () => {
 				ABI,
 				provider,
 			)
-			const nftList = await contractNFT.getAllOrders()
+			const nftList = await marketPlaceContract.methods.getAllOrders().call();
+			// const nftList = await contractNFT.getAllOrders();
+			console.log('nftList',nftList);
 			// const a = await contractNFT
 				// console.log('a',a);
 			let list = [];
 			nftList.forEach(async (e) => {
 				// const ownerOf = await machine.ownerOf(e[0]);
 				// if (ownerOf === minter) {
-					const orderId = e['orderId'].toString();
-					const tokenId = e['tokenId'].toString();
-					const seller = e['seller'].toString();
-					const price = e['price'].toString();
+					const orderId = e['orderId']?.toString();
+					const tokenId = e['tokenId']?.toString();
+					const seller = e['seller']?.toString();
+					const priceInWei = e['priceInWei']?.toString();
 				// const uri = e[2].toString();
 				// const response = await fetch(uri);
 				// const metadata = await response.json();
@@ -58,7 +60,7 @@ const NFTListOrder: React.FC = () => {
 					// name: metadata.name,
 					tokenId: tokenId,
 					orderId: orderId,
-					price,
+					priceInWei,
 					seller
 					// img: uri
 					// img: metadata.imgUrl,

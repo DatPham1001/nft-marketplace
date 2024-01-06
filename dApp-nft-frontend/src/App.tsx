@@ -25,6 +25,7 @@ import Layout from './pages/layout'
 
 function App() {
 
+	const contractAddress = "0x89A097f5533D0EeA10842f8FE028070e833f14e9";
 	// const web3provider = new ethers.providers.Web3Provider(
 	//   window.ethereum as any
 	// );
@@ -39,7 +40,8 @@ function App() {
 		marketPlaceContract: marketPlaceContract,
 		web3: web3,
 		baseImgUrl: ConfigFile.baseImgUrl,
-		pinataJwt: ConfigFile.pinataJwt
+		pinataJwt: ConfigFile.pinataJwt,
+		contractAddress: contractAddress
 	}
 
 	return (
@@ -53,10 +55,10 @@ function App() {
             </div>
           ) : ( */}
 					<Routes>
-						<Route path="/" element={<Layout children={<NFTLandingPagePage />} />} />
+						<Route path="/" element={<Layout children={<NFTLandingPagePage params={params} />} />} />
 						<Route path="/createNft" element={<Layout children={<CreateNftPage params={params} />} />} />
-						<Route path="/listOrder" element={<Layout children={<NFTListOrder />} />} />
-						<Route path="/detailNFT/:id" element={<Layout children={<DetailNFT />} />} />
+						<Route path="/listOrder" element={<Layout children={<NFTListOrder params={params} />} />} />
+						<Route path="/detailNFT/:id" element={<Layout children={<DetailNFT params={params} />} />} />
 						{/* <Route path="/create" element={
                 <Create marketplace={marketplace} nft={nft} />
               } />

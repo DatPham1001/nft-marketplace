@@ -7,15 +7,15 @@ import * as typechain from "nft-machine";
 import { ethers } from "ethers";
 import ABI from "contractABI.json";
 
-const machineContract = "0xdb312b182Bf82072A0a1375faA08f591959E4414";
 //0xD4a77Bb3BeEaC1B0CE92d465Fb34c50Eacd8355E
 //0x871010B2E49aCBfd0D1b9cbe28389c92d09f117B
 //0xdb312b182Bf82072A0a1375faA08f591959E4414
 const erc20Contract = "0xA80Bc339a70711d8a288d8d284857A47d1081E41";
 const minter = "0x35DAb71CF51B02e130F5030799479748EA3da269";
-const NFTLandingPagePage: React.FC = () => {
+const NFTLandingPagePage = ({ params }) => {
 	const [listNft, setListNft] = useState([]);
-
+	const machineContract = params.contractAddress;
+	const marketPlaceContract = params.marketPlaceContract;
 	useEffect(() => {
 		getNFTsList();
 	}, []);
@@ -31,15 +31,15 @@ const NFTLandingPagePage: React.FC = () => {
 			// );
 			// const nftList = await machine.getAllNFT();
 			// console.log(nftList);
-			const rpcUrl = 'https://rpc.sepolia.org';
-			const provider = new ethers.providers.JsonRpcProvider(rpcUrl || window.ethereum as any)
-			const contractNFT = new ethers.Contract(
-				machineContract,
-				ABI,
-				provider,
-			)
-			const nftList = await contractNFT.getAllNFT()
-
+			// const rpcUrl = 'https://rpc.sepolia.org';
+			// const provider = new ethers.providers.JsonRpcProvider(rpcUrl || window.ethereum as any)
+			// const contractNFT = new ethers.Contract(
+			// 	machineContract,
+			// 	ABI,
+			// 	provider,
+			// )
+			// const nftList = await contractNFT.getAllNFT()
+			const nftList = await marketPlaceContract.methods.getAllNFT().call();
 			let list = [];
 			nftList.forEach(async (e) => {
 				// const ownerOf = await machine.ownerOf(e[0]);

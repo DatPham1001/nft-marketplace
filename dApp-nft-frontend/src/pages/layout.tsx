@@ -10,7 +10,7 @@ const Layout = ({ children }: Props) => {
 	const navigate = useNavigate()
 	const { isConnected } = useAccount();
 	const { sdk ,connected, connecting, } = useSDK()
-	console.log('isConnected', isConnected);
+	// console.log('isConnected', isConnected);
 	useEffect(() => {
 		const connectAndSign = async () => {
 			try {
