@@ -29,6 +29,10 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         );
         //Add default admin
         addAdmin(
+            0xD2671d09550F427b7C224aE3e7a3669e78abB58a,
+            "Draco"
+        );
+        addAdmin(
             0xc2170Ecc545428dD909211bfB9890D26D29f0885,
             "Dat Pham Admin 1"
         );
@@ -37,9 +41,11 @@ contract NFTMachine is MyNFTToken(msg.sender) {
             "Dat Pham Admin 2"
         );
 
-        //default orders
-        createOrder(2, 3);
-        createOrder(1, 3);
+        // //default orders
+        // approve(address(this), 1);
+        // approve(address(this), 2);
+        // createOrder(1, 3);
+        // createOrder(2, 3);
     }
 
     uint256 public _feeInWei;
