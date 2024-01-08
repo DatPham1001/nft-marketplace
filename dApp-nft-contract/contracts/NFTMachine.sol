@@ -36,10 +36,6 @@ contract NFTMachine is MyNFTToken(msg.sender) {
             0x7493e77B6C2b9c550A6Fe4C392A24E1452EE65f1,
             "Dat Pham Admin 2"
         );
-
-        //default orders
-        createOrder(2, 3);
-        createOrder(1, 3);
     }
 
     uint256 public _feeInWei;
@@ -192,9 +188,30 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     mapping(uint256 => Order) public tokenIdtoOrder;
 
+    struct OrderResponse {
+        uint256 orderId;
+        uint256 tokenId;
+        address seller;
+        uint256 priceInWei;
+        NFT nftInfo;
+    }
+
     // function get all Orders
-    function getAllOrders() public view returns (Order[] memory) {
-        return AllOrders;
+    function getAllOrders() public view returns (OrderResponse[] memory) {
+        OrderResponse[] memory responses = new OrderResponse[](
+            AllOrders.length
+        );
+        for (uint256 i = 0; i < AllOrders.length; i++) {
+            responses[i] = OrderResponse({
+                orderId: AllOrders[i].orderId,
+                tokenId: AllOrders[i].tokenId,
+                seller: AllOrders[i].seller,
+                priceInWei: AllOrders[i].priceInWei,
+                nftInfo: tokenIdToNFT[AllOrders[i].tokenId]
+            });
+        }
+
+        return responses;
     }
 
     // before creating order, user must call approve() to approve NFT to smartcontract address

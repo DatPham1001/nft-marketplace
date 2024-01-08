@@ -1,13 +1,106 @@
 #navbar {
-    position: fixed;
-    width: 100%;
-    top: 0;
-    background-color: #fff; /* Màu nền của Navbar */
-    z-index: 1000; /* Đảm bảo nằm trên các thành phần khác */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng cho Navbar nếu cần */
-  }
-  
-  /* Khoảng trống để tránh che phủ nội dung */
-  body {
-    padding-top: 60px; /* Điều chỉnh khoảng trống tùy thuộc vào chiều cao của Navbar */
-  }
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background-color: #fff;
+  /* Màu nền của Navbar */
+  z-index: 1000;
+  /* Đảm bảo nằm trên các thành phần khác */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng cho Navbar nếu cần */
+}
+
+/* Khoảng trống để tránh che phủ nội dung */
+body {
+  padding-top: 60px;
+  /* Điều chỉnh khoảng trống tùy thuộc vào chiều cao của Navbar */
+}
+
+.modal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 182, 193, 0.7);
+}
+
+.modal-content {
+  display: flex;
+  background: #ff69b4;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  width: 600px;
+  /* Adjusted width */
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  float: right;
+}
+
+.modal-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nft-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+}
+
+.modal-right {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+}
+
+h2 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.attribute-label {
+  color: white;
+  font-size: 16px;
+}
+
+.attribute-value {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.price-input {
+  padding: 10px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.action-button {
+  background: #fff;
+  color: #ff69b4;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.action-button:last-child {
+  margin-right: 0;
+}

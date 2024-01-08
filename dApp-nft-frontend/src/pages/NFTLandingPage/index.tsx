@@ -6,7 +6,7 @@ import { MetaMaskButton } from "@metamask/sdk-react-ui";
 import * as typechain from "nft-machine";
 import { ethers } from "ethers";
 import ABI from "contractABI.json";
-
+import "../../styles/style.css"
 //0xD4a77Bb3BeEaC1B0CE92d465Fb34c50Eacd8355E
 //0x871010B2E49aCBfd0D1b9cbe28389c92d09f117B
 //0xdb312b182Bf82072A0a1375faA08f591959E4414
@@ -14,8 +14,12 @@ const erc20Contract = "0xA80Bc339a70711d8a288d8d284857A47d1081E41";
 const minter = "0x35DAb71CF51B02e130F5030799479748EA3da269";
 const NFTLandingPagePage = ({ params }) => {
 	const [listNft, setListNft] = useState([]);
+	const [showCreateModal, setShowCreateModal] = useState(false);
+	// const [selectedNft, setSelectedNft] = useState({ tokenId: "", name: "", image: "", attributes: [] });
+	const [selectedNft, setSelectedNft] = useState(null);
 	const machineContract = params.contractAddress;
 	const marketPlaceContract = params.marketPlaceContract;
+	const [loading, setLoading] = useState(false);
 	useEffect(() => {
 		getNFTsList();
 	}, []);
@@ -23,57 +27,57 @@ const NFTLandingPagePage = ({ params }) => {
 	const getNFTsList = async () => {
 		let list = [];
 
-    try {
-      const nftList = await marketPlaceContract.methods.getAllNFT().call();
-      console.log(nftList);
-      let nfts = [];
-      // nftList.map(async (e) => {
-      //   const uri = e.attribute_url;
-      //   try {
-      //     const response = await fetch(uri);
-      //     const metadata = await response.json();
-      //     console.log(metadata);
-      //     nfts.push({
-      //       name: metadata.name,
-      //       tokenId: e.tokenId,
-      //       img: metadata.image,
-      //       attributes: metadata.attributes
-      //     });
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
-      // })
-      // setListNft(nfts.slice())
-      // console.log(nfts);
-      // } catch (error) {
-      //   console.log(error);
-      // }
-      const removeIds = [];
-      for (const nft of nftList) {
-        const tokenId = nft[0].toString();
-        if (removeIds.includes(tokenId))
-          continue
-        console.log(nft);
-        
-        const uri = nft.attribute_url;
-        try {
-          const response = await fetch(uri);
-          const metadata = await response.json();
-          nfts.push({
-            name: metadata.name,
-            tokenId: tokenId,
-            img: metadata.image,
-            attributes: metadata.attributes
-          });
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      setListNft(nfts.slice())
-      console.log(nfts);
-    } catch (error) {
-      console.log(error);
-    }
+		try {
+			const nftList = await marketPlaceContract.methods.getAllNFT().call();
+			console.log(nftList);
+			let nfts = [];
+			// nftList.map(async (e) => {
+			//   const uri = e.attribute_url;
+			//   try {
+			//     const response = await fetch(uri);
+			//     const metadata = await response.json();
+			//     console.log(metadata);
+			//     nfts.push({
+			//       name: metadata.name,
+			//       tokenId: e.tokenId,
+			//       img: metadata.image,
+			//       attributes: metadata.attributes
+			//     });
+			//   } catch (error) {
+			//     console.log(error);
+			//   }
+			// })
+			// setListNft(nfts.slice())
+			// console.log(nfts);
+			// } catch (error) {
+			//   console.log(error);
+			// }
+			const removeIds = [];
+			for (const nft of nftList) {
+				const tokenId = nft[0].toString();
+				if (removeIds.includes(tokenId))
+					continue
+				console.log(nft);
+
+				const uri = nft.attribute_url;
+				try {
+					const response = await fetch(uri);
+					const metadata = await response.json();
+					nfts.push({
+						name: metadata.name,
+						tokenId: tokenId,
+						img: metadata.image,
+						attributes: metadata.attributes
+					});
+				} catch (error) {
+					console.log(error);
+				}
+			}
+			setListNft(nfts.slice())
+			console.log(nfts);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const buyNFT = async (tokenId, price) => {
@@ -159,7 +163,7 @@ const NFTLandingPagePage = ({ params }) => {
 						</div>
 					</div>
 					<div className="font-poppins gap-16 md:gap-5 grid sm:grid-cols-1 md:grid-cols-2 grid-cols-3 min-h-[auto] mt-[248px] w-[91%]">
-						{listNft.map((e) => (
+						{listNft.map((e, index) => (
 							<div className="bg-gray-100 flex flex-col items-center justify-end p-3.5 rounded-[30px] shadow-bs w-full">
 								<div className="flex flex-col gap-4 items-start justify-start mt-2.5 w-[304px]">
 									<div className="bg-purple-A200 flex flex-col items-end justify-start pt-2 px-2 rounded-[20px] w-full">
@@ -189,59 +193,6 @@ const NFTLandingPagePage = ({ params }) => {
 										</div>
 									</div>
 								</div>
-								<div className="flex flex-row gap-4 items-start justify-center mt-[18px] w-[304px]">
-									<div className="flex flex-row gap-2 items-center justify-start w-[99px]">
-										<Img
-											className="h-6 w-6"
-											src="images/img_phcurrencyeth.svg"
-											alt="phcurrencyeth"
-										/>
-										<Text
-											className="text-[15px] text-gray-900 w-auto"
-											size="txtPoppinsMedium15"
-										>
-											<span className="text-gray-900 font-poppins text-left font-medium">
-												{e.price}
-											</span>
-										</Text>
-									</div>
-									<div className="flex flex-row gap-2 items-center justify-start w-[77px]">
-										<Img
-											className="h-6 w-6"
-											src="images/img_phcrownsimple.svg"
-											alt="phcrownsimple"
-										/>
-										<Text
-											className="text-[15px] text-gray-900 w-auto"
-											size="txtPoppinsMedium15"
-										>
-											<span className="text-gray-900 font-poppins text-left font-medium">
-												1/
-											</span>
-											<span className="text-gray-900_7f font-poppins text-left font-medium">
-												100
-											</span>
-										</Text>
-									</div>
-									<div className="flex flex-row gap-2 items-center justify-start w-[91px]">
-										<Img
-											className="h-6 w-6"
-											src="images/img_clock.svg"
-											alt="clock"
-										/>
-										<Text
-											className="text-[15px] text-gray-900 w-auto"
-											size="txtPoppinsMedium15"
-										>
-											<span className="text-gray-900 font-poppins text-left font-medium">
-												13d{" "}
-											</span>
-											<span className="text-gray-900_7f font-poppins text-left font-medium">
-												2h
-											</span>
-										</Text>
-									</div>
-								</div>
 								<Button
 									className="cursor-pointer flex items-center justify-center min-w-[304px] mt-[27px] rounded-[28px]"
 									leftIcon={
@@ -252,10 +203,14 @@ const NFTLandingPagePage = ({ params }) => {
 										/>
 									}
 									color="purple_A200_cyan_A100"
-									onClick={() => buyNFT(e.tokenId, e.price)}
+									onClick={() => {
+										setShowCreateModal(true)
+										setSelectedNft(e);
+										// console.log(index);
+									}}
 								>
 									<div className="font-medium leading-[normal] text-[15px] text-left">
-										Buy
+										Create Order
 									</div>
 								</Button>
 							</div>
