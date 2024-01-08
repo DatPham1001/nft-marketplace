@@ -38,7 +38,6 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         );
 
         //default orders
-
         createOrder(2, 3);
         createOrder(1, 3);
     }
