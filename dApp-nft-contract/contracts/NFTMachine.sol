@@ -242,7 +242,7 @@ contract NFTMachine is MyNFTToken(msg.sender) {
             "You are not the seller."
         );
         require(
-            ownerOf(tokenId) == msg.sender,
+            ownerOf(orderIdtoOrder[orderId].tokenId) == msg.sender,
             "You are not the owner of this NFT."
         );
 
