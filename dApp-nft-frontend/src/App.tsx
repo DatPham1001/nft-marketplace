@@ -2,11 +2,10 @@ import { ethers } from "ethers";
 import NFTLandingPagePage from "pages/NFTLandingPage";
 import React, { useEffect, useState } from "react";
 import {
-  BrowserRouter,
-  Routes,
-  Route
+	BrowserRouter,
+	Routes,
+	Route
 } from "react-router-dom";
-import { Button, Img, Text } from "components";
 import * as typechain from "nft-machine";
 import fs from 'fs';
 import Web3 from 'web3';
@@ -15,6 +14,9 @@ import CreateNftPage from "pages/CreateNftPage";
 import ContractABI from "../contractdata/ContractABI.json"
 import ConfigFile from "../config.json"
 import AdminManagerPage from "pages/AdminManagerPage";
+import NFTListOrder from "pages/NFTListOrder";
+import DetailNFT from "pages/DetailNftPage";
+import Layout from './pages/layout'
 // const nftTokenContract = "0x9C3fc11735c3B754CCa9e5FCe6a4aa4E8e4544ab"
 // const machineContract = "0x53aeBBE1db026eA25a67Fe644d0E94Fa96a1aCb1"
 // const minter = "0x392d672E6E4ba33e8AEe46C5A9e7B87d3c802A32"
@@ -24,41 +26,42 @@ import AdminManagerPage from "pages/AdminManagerPage";
 
 function App() {
 
-  // const web3provider = new ethers.providers.Web3Provider(
-  //   window.ethereum as any
-  // );
-  // const machine = typechain.NFTMachine__factory.connect(
-  //   machineContract,
-  //   web3provider as any  
-  // );
-  const web3 = new Web3(window.ethereum);
-  
-  const marketPlaceContract = new web3.eth.Contract(ContractABI, ConfigFile.machineContract);
+	// const contractAddress = "0x89A097f5533D0EeA10842f8FE028070e833f14e9";
+	// const web3provider = new ethers.providers.Web3Provider(
+	//   window.ethereum as any
+	// );
+	// const machine = typechain.NFTMachine__factory.connect(
+	//   machineContract,
+	//   web3provider as any  
+	// );
+	const web3 = new Web3(window.ethereum);
 
-  const params = {
-    marketPlaceContract: marketPlaceContract,
-    web3: web3,
-    baseImgUrl: ConfigFile.baseImgUrl,
-    pinataJwt: ConfigFile.pinataJwt
-  }
+	const marketPlaceContract = new web3.eth.Contract(ContractABI, ConfigFile.machineContract);
+	const params = {
+		marketPlaceContract: marketPlaceContract,
+		web3: web3,
+		baseImgUrl: ConfigFile.baseImgUrl,
+		pinataJwt: ConfigFile.pinataJwt,
+		contractAddress: ConfigFile.machineContract
+	}
 
-  return (
-    <BrowserRouter>
-      <div className="App">
-        <>
-        </>
-        <div>
-          {/* {loading ? (
+	return (
+		<BrowserRouter>
+			<div className="App">
+				<div>
+					{/* {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
               <Spinner animation="border" style={{ display: 'flex' }} />
               <p className='mx-3 my-0'>Awaiting Metamask Connection...</p>
             </div>
           ) : ( */}
-          <Routes>
-            <Route path="/" element={<NFTLandingPagePage params={params} />} />
-            <Route path="/createNft" element={<CreateNftPage params={params} />} />
-            <Route path="/admin-manager" element={<AdminManagerPage params={params} />} />
-            {/* <Route path="/create" element={
+					<Routes>
+						<Route path="/" element={<Layout children={<NFTLandingPagePage params={params} />} />} />
+						<Route path="/createNft" element={<Layout children={<CreateNftPage params={params} />} />} />
+						<Route path="/admin-manager" element={<Layout children={<AdminManagerPage params={params} />} />} />
+						<Route path="/listOrder" element={<Layout children={<NFTListOrder params={params} />} />} />
+						<Route path="/detailNFT/:id" element={<Layout children={<DetailNFT params={params} />} />} />
+						{/* <Route path="/create" element={
                 <Create marketplace={marketplace} nft={nft} />
               } />
               <Route path="/my-listed-items" element={
@@ -67,15 +70,15 @@ function App() {
               <Route path="/my-purchases" element={
                 <MyPurchases marketplace={marketplace} nft={nft} account={account} />
               } /> */}
-          </Routes>
-          {/* )} */}
-        </div>
-      </div>
-      <div className="text-center text-gray-600 mt-8">
-        © 2023 Your Company. All rights reserved.
-      </div>
-    </BrowserRouter>
-  )
+					</Routes>
+					{/* )} */}
+				</div>
+			</div>
+			<div className="text-center text-gray-600 mt-8">
+				© 2023 Your Company. All rights reserved.
+			</div>
+		</BrowserRouter>
+	)
 
 }
 
