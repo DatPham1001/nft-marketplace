@@ -205,29 +205,6 @@ const CreateNftPage = ({ params }) => {
 
   return (
     <>
-      <div
-        className={`bg-gray-100 flex flex-col font-poetsenone items-end justify-start mx-auto pb-[94px] md:pl-10 sm:pl-5 pl-[94px] w-full`}
-      >
-        <div className="flex flex-col items-start justify-start w-[98%] md:w-full">
-          <div className="flex md:flex-col flex-row md:gap-10 items-end justify-between w-full">
-            <div className="flex flex-col items-center justify-start md:mt-0 mt-12">
-              <Text
-                className="backdrop-opacity-[0.5] blur-[15.00px] text-5xl sm:text-[38px] md:text-[44px] text-purple-A200"
-                size="txtPoetsenOneRegular48"
-              >
-                NFT
-              </Text>
-              <Text
-                className="text-5xl sm:text-[38px] md:text-[44px] text-purple-A200"
-                size="txtPoetsenOneRegular48"
-              >
-                NFT
-              </Text>
-            </div>
-            <NavBar/>
-          </div>
-        </div>
-      </div >
       <div className="font-poppins gap-16 md:gap-5 grid sm:grid-cols-1 md:grid-cols-2 grid-cols-3 min-h-[auto] mt-[248px] w-[91%] mx-auto bg-pink-100 p-8 rounded-lg shadow-lg">
         <div className="col-span-1">
           <label className="text-xl text-pink-800 mb-2 block">

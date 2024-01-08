@@ -14,54 +14,32 @@ import "./MyNFTToken.sol";
 // error PriceMustBeAboveZero();
 
 contract NFTMachine is MyNFTToken(msg.sender) {
-     constructor() {
-        //Add default NFTs
-        mintNewNFT("https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft2.json");
-        mintNewNFT("https://ipfs.io/ipfs/QmW2Ethso9Bp3bDkTNyfwecypkKd79viyV7WH2rMTJhDAU");
-        mintNewNFT("https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft1.json");
-        // AllNFTs.push(
-        //     NFT({
-        //         tokenId: 9999999999,
-        //         attribute_url: "https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft2.json"
-        //     })
-        // );
-        // AllNFTs.push(
-        //     NFT({
-        //         tokenId: 99999999991,
-        //         attribute_url: "https://ipfs.io/ipfs/QmW2Ethso9Bp3bDkTNyfwecypkKd79viyV7WH2rMTJhDAU"
-        //     })
-        // );
-        // AllNFTs.push(
-        //     NFT({
-        //         tokenId: 99999999992,
-        //         attribute_url: "https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft1.json"
-        //     })
-        // );
-
+    constructor() {
+        mintNewNFT(
+            "https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft2.json"
+        );
+        mintNewNFT(
+            "https://ipfs.io/ipfs/QmW2Ethso9Bp3bDkTNyfwecypkKd79viyV7WH2rMTJhDAU"
+        );
+        mintNewNFT(
+            "https://ipfs.io/ipfs/QmWbdREEQY8rJ5ZdwvJL6JzoHeHh2QkNWF6hn49srdhiTY/Nft1.json"
+        );
+        mintNewNFT(
+            "https://ipfs.io/ipfs/QmcSkjzjDpKvJtZtp8kmkUJCYs1aoqpfa8yygRzgUQ6wpP"
+        );
         //Add default admin
-        addAdmin(0xD2671d09550F427b7C224aE3e7a3669e78abB58a, "Draco");
-        addAdmin(0xc2170Ecc545428dD909211bfB9890D26D29f0885, "Dat Pham Admin 1");
-        addAdmin(0x7493e77B6C2b9c550A6Fe4C392A24E1452EE65f1, "Dat Pham Admin 2");
+        addAdmin(
+            0xc2170Ecc545428dD909211bfB9890D26D29f0885,
+            "Dat Pham Admin 1"
+        );
+        addAdmin(
+            0x7493e77B6C2b9c550A6Fe4C392A24E1452EE65f1,
+            "Dat Pham Admin 2"
+        );
 
-        // allAdmins.push(
-        //     Admin({
-        //         adminAddress: address(
-        //             0xc2170Ecc545428dD909211bfB9890D26D29f0885
-        //         ),
-        //         adminName: "Dat Pham Admin 1",
-        //         status: "Y"
-        //     })
-        // );
-
-        // allAdmins.push(
-        //     Admin({
-        //         adminAddress: address(
-        //             0x7493e77B6C2b9c550A6Fe4C392A24E1452EE65f1
-        //         ),
-        //         adminName: "Dat Pham Admin 2",
-        //         status: "Y"
-        //     })
-        // );
+        //default orders
+        createOrder(2, 3);
+        createOrder(1, 3);
     }
 
     uint256 public _feeInWei;
@@ -90,11 +68,10 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     }
 
     // function add new Admin
-    function addAdmin(address newAdminAddress, string memory name)
-        public
-        onlyOwner
-        returns (bool)
-    {
+    function addAdmin(
+        address newAdminAddress,
+        string memory name
+    ) public onlyOwner returns (bool) {
         // require(msg.sender == owner(), "Only owner can add new admin");
 
         require(!isAdmin[newAdminAddress], "Admin already exists");
@@ -121,11 +98,9 @@ contract NFTMachine is MyNFTToken(msg.sender) {
         return true;
     }
 
-    function deactivateAdmin(address adminAddress)
-        public
-        onlyOwner
-        returns (bool)
-    {
+    function deactivateAdmin(
+        address adminAddress
+    ) public onlyOwner returns (bool) {
         for (uint256 i = 0; i < allAdmins.length; i++) {
             if (allAdmins[i].adminAddress == adminAddress) {
                 allAdmins[i].status = "N";
@@ -183,11 +158,9 @@ contract NFTMachine is MyNFTToken(msg.sender) {
     }
 
     // function get owner's all NFT
-    function getOwnerNFT(address owner_address)
-        public
-        view
-        returns (NFT[] memory)
-    {
+    function getOwnerNFT(
+        address owner_address
+    ) public view returns (NFT[] memory) {
         NFT[] memory owner_NFT = new NFT[](
             userNFTCollection[owner_address].length
         );
@@ -226,10 +199,10 @@ contract NFTMachine is MyNFTToken(msg.sender) {
 
     // before creating order, user must call approve() to approve NFT to smartcontract address
     // function create order
-    function createOrder(uint256 tokenId, uint256 priceInWei)
-        public
-        returns (uint256)
-    {
+    function createOrder(
+        uint256 tokenId,
+        uint256 priceInWei
+    ) public returns (uint256) {
         address nftOwner = this.ownerOf(tokenId);
         require(
             this.getApproved(tokenId) == address(this) ||

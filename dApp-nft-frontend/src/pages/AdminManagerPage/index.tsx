@@ -129,29 +129,6 @@ const AdminManagerPage = ({ params }) => {
 
     return (
         <>
-            <div
-                className={`bg-gray-100 flex flex-col font-poetsenone items-end justify-start mx-auto pb-[94px] md:pl-10 sm:pl-5 pl-[94px] w-full`}
-            >
-                <div className="flex flex-col items-start justify-start w-[98%] md:w-full">
-                    <div className="flex md:flex-col flex-row md:gap-10 items-end justify-between w-full">
-                        <div className="flex flex-col items-center justify-start md:mt-0 mt-12">
-                            <Text
-                                className="backdrop-opacity-[0.5] blur-[15.00px] text-5xl sm:text-[38px] md:text-[44px] text-purple-A200"
-                                size="txtPoetsenOneRegular48"
-                            >
-                                NFT
-                            </Text>
-                            <Text
-                                className="text-5xl sm:text-[38px] md:text-[44px] text-purple-A200"
-                                size="txtPoetsenOneRegular48"
-                            >
-                                NFT
-                            </Text>
-                        </div>
-                        <NavBar></NavBar>
-                    </div>
-                </div>
-            </div>
             <div className="flex flex-col items-center justify-center min-h-screen mx-auto max-w-screen-xl px-8">
                 <div className="flex justify-between items-center mb-4 w-full">
                     <h1 className="text-3xl font-bold">Admin Manager</h1>
