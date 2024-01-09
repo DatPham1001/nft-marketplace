@@ -123,6 +123,11 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -691,9 +696,26 @@
 						"internalType": "uint256",
 						"name": "priceInWei",
 						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "tokenId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "attribute_url",
+								"type": "string"
+							}
+						],
+						"internalType": "struct NFTMachine.NFT",
+						"name": "nftInfo",
+						"type": "tuple"
 					}
 				],
-				"internalType": "struct NFTMachine.Order[]",
+				"internalType": "struct NFTMachine.OrderResponse[]",
 				"name": "",
 				"type": "tuple[]"
 			}

@@ -73,8 +73,10 @@ const Layout = ({ children }: Props) => {
 
 									<nav className="flex md:flex-1 md:flex-col flex-row font-poppins md:gap-10 gap-16 items-center justify-start md:pr-10 pr-32 sm:pr-5 pt-12 w-auto md:w-full">
 										<NavLink exact to="/" className="text-lg text-purple-A200 w-auto"
+											size="txtPoppinsMedium18">Home</NavLink>
+										<NavLink exact to="/allNFT" className="text-lg text-purple-A200 w-auto"
 											size="txtPoppinsMedium18">
-											Home
+											NFTs
 										</NavLink>
 										{
 											((accounts[0] ? accounts[0].toLowerCase() : "") == ConfigFile.minter.toLowerCase())
@@ -84,8 +86,7 @@ const Layout = ({ children }: Props) => {
 										}
 										<NavLink exact to="/createNft" className="text-lg text-purple-A200 w-auto"
 											size="txtPoppinsMedium10">Create NFT</NavLink>
-										<NavLink exact to="/listOrder" className="text-lg text-purple-A200 w-auto"
-											size="txtPoppinsMedium18">List Orders</NavLink>
+
 									</nav>
 								</div>
 								<MetaMaskButton theme={"light"} color="white"></MetaMaskButton>

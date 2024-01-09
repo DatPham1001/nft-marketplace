@@ -56,10 +56,10 @@ function App() {
             </div>
           ) : ( */}
 					<Routes>
-						<Route path="/" element={<Layout children={<NFTLandingPagePage params={params} />} />} />
+						<Route path="/allNFT" element={<Layout children={<NFTLandingPagePage params={params} />} />} />
 						<Route path="/createNft" element={<Layout children={<CreateNftPage params={params} />} />} />
 						<Route path="/admin-manager" element={<Layout children={<AdminManagerPage params={params} />} />} />
-						<Route path="/listOrder" element={<Layout children={<NFTListOrder params={params} />} />} />
+						<Route path="/" element={<Layout children={<NFTListOrder params={params} />} />} />
 						<Route path="/detailNFT/:id" element={<Layout children={<DetailNFT params={params} />} />} />
 						{/* <Route path="/create" element={
                 <Create marketplace={marketplace} nft={nft} />

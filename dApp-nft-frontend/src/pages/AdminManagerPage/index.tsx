@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Text } from "components";
 import NFTLandingPageStack from "components/NFTLandingPageStack";
@@ -34,7 +34,9 @@ const AdminManagerPage = ({ params }) => {
     const [name, setName] = useState('');
     const [walletAddress, setWalletAddress] = useState('');
     const [accounts, setAccounts] = useState([]);
+    const modalRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
+
         window.ethereum
             .request({ method: 'eth_requestAccounts', })
             .then((accounts) => {

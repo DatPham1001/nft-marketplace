@@ -40,34 +40,60 @@ const NFTListOrder = ({ params }) => {
 				ABI,
 				provider,
 			)
-			const nftList = await marketPlaceContract.methods.getAllOrders().call();
+			const listOders = await marketPlaceContract.methods.getAllOrders().call();
 			// const nftList = await contractNFT.getAllOrders();
-			console.log('nftList', nftList);
+			console.log('listOders', listOders);
 			// const a = await contractNFT
 			// console.log('a',a);
 			let list = [];
-			nftList.forEach(async (e) => {
-				// const ownerOf = await machine.ownerOf(e[0]);
-				// if (ownerOf === minter) {
+			// for (const order of listOders) {
+			// 	const nftInfo = order.nftInfo;
+			// 	try {
+			// 	  const response = await fetch(nftInfo.attribute_url);
+			// 	  const metadata = await response.json();
+			// 	  nfts.push({
+			// 		name: metadata.name,
+			// 		tokenId: tokenId,
+			// 		img: metadata.image,
+			// 		attributes: metadata.attributes
+			// 	  });
+			// 	  list.push({
+			// 		// name: metadata.name,
+			// 		tokenId: order.tokenId,
+			// 		orderId: order.orderId,
+			// 		priceInWei : order.priceInWei,
+			// 		seller : order.seller
+			// 		// img: uri
+			// 		// img: metadata.imgUrl,
+			// 	});
+			// 	// }
+			// 	setListNft(prev => [...list]);
+			// 	} catch (error) {
+			// 	  console.log(error);
+			// 	}
+			//   }
+
+			listOders.forEach(async (e: { [x: string]: { toString: () => any; }; nftInfo: any; }) => {
+				const nftInfo = e.nftInfo;
 				const orderId = e['orderId']?.toString();
 				const tokenId = e['tokenId']?.toString();
 				const seller = e['seller']?.toString();
 				const priceInWei = e['priceInWei']?.toString();
 				// const uri = e[2].toString();
-				// const response = await fetch(uri);
-				// const metadata = await response.json();
+				const response = await fetch(nftInfo.attribute_url);
+				const metadata = await response.json();
 				list.push({
-					// name: metadata.name,
 					tokenId: tokenId,
 					orderId: orderId,
 					priceInWei,
-					seller
-					// img: uri
-					// img: metadata.imgUrl,
+					seller,
+					nftInfo: metadata
 				});
 				// }
 				setListNft(prev => [...list]);
 			});
+			console.log(list);
+
 		} catch (error) {
 			console.log(error);
 		}
@@ -192,7 +218,7 @@ const NFTListOrder = ({ params }) => {
 										<div className="flex flex-col items-center justify-start mr-[52px] w-[56%] md:w-full" onClick={() => navigate(`/detailNFT/${e.orderId}`)}>
 											<Img
 												className="h-[232px] md:h-auto object-cover w-full"
-												src={e.img}
+												src={e.nftInfo.image}
 												alt="TwentyOne"
 											/>
 										</div>
@@ -204,13 +230,7 @@ const NFTListOrder = ({ params }) => {
 												className="text-gray-900 text-lg w-auto"
 												size="txtPoppinsSemiBold18"
 											>
-												{e.name}
-											</Text>
-											<Text
-												className="text-gray-900_bf text-xs w-auto"
-												size="txtPoppinsMedium12"
-											>
-												Created by Vuong Huu Hung
+												{e.nftInfo.name}
 											</Text>
 										</div>
 									</div>
@@ -227,11 +247,11 @@ const NFTListOrder = ({ params }) => {
 											size="txtPoppinsMedium15"
 										>
 											<span className="text-gray-900 font-poppins text-left font-medium">
-												{e.price}
+												{e.priceInWei} Wei
 											</span>
 										</Text>
 									</div>
-									<div className="flex flex-row gap-2 items-center justify-start w-[77px]">
+									{/* <div className="flex flex-row gap-2 items-center justify-start w-[77px]">
 										<Img
 											className="h-6 w-6"
 											src="images/img_phcrownsimple.svg"
@@ -248,8 +268,8 @@ const NFTListOrder = ({ params }) => {
 												100
 											</span>
 										</Text>
-									</div>
-									<div className="flex flex-row gap-2 items-center justify-start w-[91px]">
+									</div> */}
+									{/* <div className="flex flex-row gap-2 items-center justify-start w-[91px]">
 										<Img
 											className="h-6 w-6"
 											src="images/img_clock.svg"
@@ -266,7 +286,7 @@ const NFTListOrder = ({ params }) => {
 												2h
 											</span>
 										</Text>
-									</div>
+									</div> */}
 								</div>
 								<Button
 									className="cursor-pointer flex items-center justify-center min-w-[304px] mt-[27px] rounded-[28px]"
@@ -281,7 +301,7 @@ const NFTListOrder = ({ params }) => {
 								// onClick={() => buyNFT(e.tokenId, e.price)}
 								>
 									<div className="font-medium leading-[normal] text-[15px] text-left">
-										Place Bid
+										Buy
 									</div>
 								</Button>
 							</div>
